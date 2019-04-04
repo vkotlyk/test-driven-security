@@ -54,7 +54,7 @@ const debug = require('debug')('node-security');
 debug(e);
 ```
 
-## Invalid login and password feedback
+## Invalid login and password feedback [invalid_login_credentials]
 
 Currently we provide no feedback on invalid login credentials.
 
