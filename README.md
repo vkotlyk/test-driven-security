@@ -201,6 +201,7 @@ const COOKIE_OPTIONS = {secure: isProduction, httpOnly: true};
 
 const {session} = userSession(COOKIE_OPTIONS);
 ```
+httpOnly: true means JS won't be able to access our session after XSS attack.
 
 middleware/session.js
 ```javascript
@@ -214,3 +215,40 @@ module.exports = cookie => {
 ```
 
 Unskip the following test: 'Cookie is HTTPOnly and not accessible in JS'
+
+## Session fixation [session_fixation]
+
+Open browser in normal and incognito mode.
+
+In the incognito mode create attacker account.
+
+Log in and log out to obtain session ID.
+
+In the application tab in Chrome copy session ID.
+
+Paste session ID in the normal tab and create victim account.
+
+Once you log in as a victim refresh attackers incognito tab.
+
+You should be logged-in in both tabs.
+
+We'd like express-session to generate a new session ID on each successful login.
+
+routes/login.js
+```javascript
+req.session.regenerate(function(err) {
+    req.session.user = {username: username.split('@')[0]};
+    res.format({
+        'text/html'() {
+            res.redirect('/');
+        },
+        'application/json'() {
+            res.json('Success');
+        }
+    });
+});
+```
+
+Note: if you decide to generate session IDs [yourself](https://github.com/expressjs/session#genid) please make sure
+it's difficult to guess them by the attacker.
+Preferably stick to the default express-session generator.

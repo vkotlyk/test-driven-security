@@ -233,7 +233,7 @@ describe('Node Security', function() {
         assert.deepStrictEqual(parsedCookie.httpOnly, true);
     });
 
-    it.skip('Session fixation is prevented with new session ID on each login', async function () {
+    it('Session fixation is prevented with new session ID on each login', async function () {
         const cookies = await user();
 
         const loginResult1 = await loginWithCookie(cookies, DEFAULT_USER_CREDENTIALS).expect(302);
