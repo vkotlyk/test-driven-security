@@ -123,7 +123,7 @@ describe('Node Security', function() {
         return request
             .post('/post')
             .send({post: msg})
-            .set('csrf-token', csrfToken)
+            .set('csrf-token', csrfToken || '')
             .set('Content-Type', 'application/json')
             .set('Cookie', toRequestCookies(cookies));
     }
@@ -267,13 +267,12 @@ describe('Node Security', function() {
         assert.ok(jwtCookie.maxAge, 60);
     });
 
-    it.skip('Basic register/login/post/read posts flow happy path for SPA', async function () {
+    it('Basic register/login/post/read posts flow happy path for SPA', async function () {
         await registerJSON(DEFAULT_USER_CREDENTIALS).expect(200, '"Registered"');
         const loginResponse = await loginJSON(DEFAULT_USER_CREDENTIALS).expect(200, '"Success"');
-        const {body: {csrfToken}} = await getJSON({url: '/', cookies: extractSetCookies(loginResponse)}).expect(200);
+        const {jwt} = extractSetCookies(loginResponse);
         const {header: {location}} = await postJSON({
-            cookies: extractSetCookies(loginResponse),
-            csrfToken,
+            cookies: {jwt},
             msg: 'test post'
         }).expect(302);
         const listPostsResponse = await getJSON({url: location}).expect(200);

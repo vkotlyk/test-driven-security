@@ -437,3 +437,45 @@ header to the server.
 Well, it opens possibility of the XSS attack. localStorage is not the most secure
 place and HTTPOnly cookies are much better place to store your tokens.
 
+## JWT verification [jwt_verification]
+
+To verify JWT inside a cookie we need to add cookie-parser module.
+It is similar to express-session but allows to parse custom cookies,
+not just the ones managed by express-session.
+
+app.js
+```javascript
+const cookieParser = require('cookie-parser');
+const isAuthenticated = require('./middleware/authentication')(JWT_SECRET);
+
+app.use(cookieParser());
+```
+
+middleware/authentication.js
+```javascript
+const jwt = require('jsonwebtoken');
+const {BAD_REQUEST} = require('../statusCodes');
+
+const isAuthenticated = jwtSecret => (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else if (req.cookies.jwt) {
+        const token = req.cookies.jwt;
+        try {
+            req.user = jwt.verify(token, jwtSecret);
+            next();
+        } catch (e) {
+            res.status(BAD_REQUEST).send(e.message);
+        }
+    } else {
+        res.status(BAD_REQUEST).send("Only authenticated users can post");
+    }
+};
+
+module.exports = isAuthenticated;
+```
+We passed the same JWT_SECRET to our middleware as we used during login.
+
+Rune this test: 'Basic register/login/post/read posts flow happy path for SPA'.
+It deliberately simulates SPA issuing requests and not using node-security
+cookie, only jwt cookie.

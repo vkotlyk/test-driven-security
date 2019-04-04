@@ -12,8 +12,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'jwtsecret';
 require('./output/sanitizeHtml')(hbs);
 
 const bodyParser = require('body-parser');
-const isAuthenticated = require('./middleware/authentication')();
+const isAuthenticated = require('./middleware/authentication')(JWT_SECRET);
 const userSession = require('./middleware/session');
+const cookieParser = require('cookie-parser');
 const limiter = require('./middleware/rateLimit');
 
 const home = require('./routes/home');
@@ -36,6 +37,7 @@ module.exports = async function initApp() {
     app.set("views", path.join(__dirname, "views"));
     app.set("view engine", "hbs");
 
+    app.use(cookieParser());
     app.use(session);
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(bodyParser.json());
