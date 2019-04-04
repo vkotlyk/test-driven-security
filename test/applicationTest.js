@@ -196,7 +196,7 @@ describe('Node Security', function() {
             .expect(429, /Too many requests, please try again later/);
     });
 
-    it.skip('XSS prevention in HTML', async function () {
+    it('XSS prevention in HTML', async function () {
         const {cookies, csrfToken} = await userWithCSRFToken();
 
         const {header: {location}} = await post({

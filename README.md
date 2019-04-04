@@ -104,3 +104,27 @@ you may consider writing the counter value to a database.
 
 If you don't want to block users but slow them down instead
 there's another [module](https://www.npmjs.com/package/express-slow-down).
+
+## Brute force attacks prevention - other mechanisms
+
+After a few failed login attempts layer those mechanisms:
+- CAPTCHA (tricky for humans, machines can solve them nowadays)
+- temporary lockout and email secret link to unlock
+
+## Script injection into HTML [xss_html]
+
+After our users log in they can post messages.
+
+Add a post with the following text:
+```
+<script>console.log(document.cookie)</script>
+```
+
+We've just exposed ourselves to XSS attack.
+Obviously the attacker wouldn't just console.log but
+would try to access your cookies, local storage etc. and send
+ this data to their server with img/XMLHttpRequest/fetch etc.
+
+There's a test 'XSS prevention in HTML' telling us to escape HTML content.
+
+In the views/home.hbs replace {{{}}} with {{}} to escape HTML content. It should make the test green.
