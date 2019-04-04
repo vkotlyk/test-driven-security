@@ -527,3 +527,14 @@ const error = require('./errors/error');
 // after all routes
 app.use(error);
 ```
+
+## NoSQL injection [nosql_injection]
+
+Let's continue our exploration of malicious input data.
+This time we'll attempt NoSQL injection.
+
+Relevant test: 'NoSQL injection prevention with sanitization'
+
+When we run this test and set a debugger in the POST /login we'll find out
+that the attacker read the user and then the application crashed
+on bcrypt.compare.
