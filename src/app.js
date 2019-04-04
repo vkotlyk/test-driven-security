@@ -7,6 +7,7 @@ const DB = 'mongodb://localhost:27017/node-security';
 const ENV = process.env.NODE_ENV || 'development';
 const isProduction = ENV.toLowerCase() === 'production';
 const COOKIE_OPTIONS = {secure: isProduction, httpOnly: true};
+const JWT_SECRET = process.env.JWT_SECRET || 'jwtsecret';
 
 require('./output/sanitizeHtml')(hbs);
 
@@ -44,7 +45,7 @@ module.exports = async function initApp() {
     app.get('/register', (req, res) => res.render('register'));
     app.post('/register', register(users));
     app.get('/login', (req, res) => res.render('login'));
-    app.post('/login', limiter(), login(users));
+    app.post('/login', limiter(), login({users, jwtSecret: JWT_SECRET, cookieOptions: COOKIE_OPTIONS}));
     app.get('/logout', logout);
     app.post('/post', isAuthenticated, addPost(posts));
 

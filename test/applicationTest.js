@@ -258,7 +258,7 @@ describe('Node Security', function() {
         assert.ok(mark.password !== sue.password); // different after hashing
     });
 
-    it.skip('Cookies with JWT', async function () {
+    it('Cookies with JWT', async function () {
         const cookies = await user();
 
         const jwtCookie = cookies['jwt'];

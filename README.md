@@ -370,3 +370,70 @@ It's nicely hidden inside the bcrypt hashing algorithm.
 Good Software Design TM.
 Please note that salt doesn't require any special protection,
 it can live encoded inside your hash.
+
+## The Case for JSON Web Token (JWT)
+
+So far we've been authenticating our users with SessionID stored in cookies.
+
+![Cookies and SESSIONID](https://i.imgur.com/1MKUqTV.jpg?1)
+
+One drawback of this approach is that each request after first login has to go to the database.
+
+Welcome JWT!
+
+![Cookies and JWT](https://i.imgur.com/AJMH7D2.jpg?1)
+
+If we replace SessionID with JWT we can perform all subsequent checks
+in memory without going back to the database.
+
+What are practical implications?
+* lower impact on our database
+* stateless authentication: we can move the code after login to a separate service and it can
+check users in-memory without contacting service with users.
+
+## JWT signing [jwt_signing]
+
+So imagine we'd like to move POST /post handling to a separate service
+but still allow only logged-in users to POST new entries.
+
+Let's add JWT tokens to our application.
+
+app.js
+```javascript
+const JWT_SECRET = process.env.JWT_SECRET || 'jwtsecret';
+
+app.post('/login', limiter(), login({users, jwtSecret: JWT_SECRET, cookieOptions: COOKIE_OPTIONS}))
+```
+We' need to change the signature of login to inject jwtSecret and cookieOptions.
+
+routes/login.js
+```javascript
+const jwt = require('jsonwebtoken');
+
+const login = ({users, uuid, jwtSecret, cookieOptions}) => async (req, res) => {
+    const token = jwt.sign({username}, jwtSecret, {expiresIn: '1h'});
+    res.cookie('jwt', token, {...cookieOptions, maxAge: 1 * 60 * 1000});
+
+    req.session.regenerate();
+}
+```
+We sign our JWT token with a secret. We gonna use symmetrical key in this example
+but we could also use private key instead.
+
+Out JWT token will be valid for 1 hour.
+
+Let's see if JWT cookie is being set in test 'Cookies with JWT'.
+
+Try to console.log your token and paste it into jwt.io.
+Important observations:
+* anyone can see the payload inside JWT token so don't put any secrets there
+* only key owners can verify signature
+
+
+You may be wondering why we don't follow most tutorials telling you to put
+JWT token in the response body, then store it in local storage and then send it with Authorization
+header to the server.
+
+Well, it opens possibility of the XSS attack. localStorage is not the most secure
+place and HTTPOnly cookies are much better place to store your tokens.
+
