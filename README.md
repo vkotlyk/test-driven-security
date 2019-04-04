@@ -548,3 +548,50 @@ Relevant test: 'Blind NoSQL injection with a popular password'
 This time we find a first user matching regex and use a [popular password](https://en.wikipedia.org/wiki/List_of_the_most_common_passwords).
 
 Instead of 400 we've just managed to log in to the victim's account.
+
+## Validate user input [validate_input]
+
+Let's validate that username is an email.
+
+Please try not to use regular expressions as it's easy to perform ReDOS attack.
+You should prefer mature validation libraries instead.
+
+We have several libraries to choose from:
+* [validator.js](https://github.com/chriso/validator.js)
+* [joi](https://github.com/hapijs/joi)
+* [ajv](https://github.com/epoberezkin/ajv)
+* [express-validator](https://github.com/express-validator/express-validator)
+
+I'll use validator.js which is the simplest one and allows to easily write
+custom error messages. Schema based approach like joi or ajv have more difficult
+to customize custom error messages, but lead to more concise code.
+
+input/validateCredentials.js
+```javascript
+const validator = require('validator');
+
+function validateCredentials({username, password}) {
+    if (typeof username !== "string" || !validator.isEmail(String(username))) {
+        return {error: "Username is invalid", hint: "Please use email address"};
+    }
+    if (typeof password !== "string") {
+        return {error: "Password is invalid", hint: "Please use a string value"};
+    }
+    if (!validator.isLength(password, {max: 128})) {
+        return {error: "Password is invalid", hint: "Please use a password up to 256 characters"};
+    }
+}
+
+module.exports = validateCredentials;
+```
+
+routes/login.js
+```javascript
+const {UNAUTHORIZED, BAD_REQUEST} = require('../statusCodes');
+const validateCredentials = require('../input/validateCredentials');
+
+const error = validateCredentials({username, password});
+if (error) return userErrorPage('login', res.status(BAD_REQUEST), error);
+```
+
+Now all tests should go green again.

@@ -1,10 +1,13 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userErrorPage = require('../errors/userErrorPage');
-const {UNAUTHORIZED} = require('../statusCodes');
+const {UNAUTHORIZED, BAD_REQUEST} = require('../statusCodes');
+const validateCredentials = require('../input/validateCredentials');
 
 const login = ({users, uuid, jwtSecret, cookieOptions}) => async (req, res) => {
     const {username, password} = req.body;
+    const error = validateCredentials({username, password});
+    if (error) return userErrorPage('login', res.status(BAD_REQUEST), error);
 
     const user = await users.findOne({username});
 
