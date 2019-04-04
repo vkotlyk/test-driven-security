@@ -1,6 +1,7 @@
 <h2>HTML form</h2>
 {{#if error}}
     <h2 class="registration-error">{{error}}</h2>
+    <p class="registration-hint">{{hint}}</p>
 {{/if}}
 <form method="post" action="/register">
     Username: <input name="username" placeholder="email@example.com"> <br>

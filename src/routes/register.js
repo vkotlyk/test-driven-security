@@ -1,11 +1,14 @@
 const bcrypt = require('bcryptjs');
 const userErrorPage = require('../errors/userErrorPage');
-const {CONFLICT} = require('../statusCodes');
+const {CONFLICT, BAD_REQUEST} = require('../statusCodes');
 const HASHING_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 1;
 const debug = require('debug')('node-security');
+const validateCredentials = require('../input/validateCredentials');
 
 const register = users => async (req, res) => {
     const {username, password} = req.body;
+    const error = validateCredentials({username, password});
+    if (error) return userErrorPage('register', res.status(BAD_REQUEST), error);
 
     try {
         const hashedPassword = await bcrypt.hash(password, HASHING_ROUNDS);

@@ -595,3 +595,31 @@ if (error) return userErrorPage('login', res.status(BAD_REQUEST), error);
 ```
 
 Now all tests should go green again.
+
+## Validate input with a hint [validation_hint]
+
+Relevant test: 'Only email allowed for username'
+
+When user tries to register we want to provide feedback why it may be failing.
+
+Add the same validation to register.
+
+routes/register.js
+```
+const {CONFLICT, BAD_REQUEST} = require('../statusCodes');
+const validateCredentials = require('../input/validateCredentials');
+
+const error = validateCredentials({username, password});
+if (error) return userErrorPage('register', res.status(BAD_REQUEST), error);
+```
+In future we may consider extracting common code to a middleware, but
+for now let's leave it as it is.
+
+Also, we need to add extra failing reason hint to the HTML:
+views/register.hbs
+```html
+{{#if error}}
+    <h2 class="registration-error">{{error}}</h2>
+    <p class="registration-hint">{{hint}}</p>
+{{/if}}
+```

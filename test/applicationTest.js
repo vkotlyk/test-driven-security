@@ -25,7 +25,7 @@ function extractSetCookies(result) {
     return pairs.reduce((acc, [name, cookie]) => ({...acc, [name]: cookie}), {});
 }
 
-describe('Node Security', function() {
+describe('Node Security', function () {
     this.timeout(5000);
 
     let app, request;
@@ -304,7 +304,7 @@ describe('Node Security', function() {
             });
     });
 
-    it.skip('Only email allowed for username', async function () {
+    it('Only email allowed for username', async function () {
         await register({username: 'mark', password: 'pass'})
             .expect(400).expect(/Username is invalid/).expect(/Please use email address/);
 
@@ -448,7 +448,7 @@ describe('Node Security', function() {
     });
 
     function oauthFlow(state) {
-        return async function(status, body) {
+        return async function (status, body) {
             const authResponse = await request.get('/auth').expect(302);
             const cookies = extractSetCookies(authResponse);
             return openPage({url: `/callback?code=${OAUTH_CODE}&state=${state}`, cookies}).expect(status, body);
@@ -461,7 +461,10 @@ describe('Node Security', function() {
             return Promise.resolve({access_token: 'token_to_github_api'});
         };
         const callbackResponse = await oauthFlow(STATE)(302, /Found/);
-        await openPage({url: callbackResponse.header.location, cookies: extractSetCookies(callbackResponse)}).expect(200, /github user/);
+        await openPage({
+            url: callbackResponse.header.location,
+            cookies: extractSetCookies(callbackResponse)
+        }).expect(200, /github user/);
 
         assert.deepStrictEqual(githubOauth.getToken.invokedWith, {code: OAUTH_CODE});
     });
