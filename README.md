@@ -498,4 +498,32 @@ More:
 http://cryto.net/~joepie91/blog/2016/06/13/stop-using-jwt-for-sessions/
 http://cryto.net/~joepie91/blog/2016/06/19/stop-using-jwt-for-sessions-part-2-why-your-solution-doesnt-work/
 
-Let's swtich back to session ID based cookies.
+## Handling large payload and error messages [big_payload]
+
+Let's simulate a scenario when user submits large payload exceeding 100kb.
+This value is a default max request body size for the [body parser](https://github.com/expressjs/body-parser#limit).
+
+Relevant test: 'Huge payload in request'.
+
+We're expecting 413 Payload Too Large with a corresponding body error message.
+What we're getting instead is full stack trace.
+This is default express behavior that's convenient for development
+but unacceptable for production.
+
+We need to add custom error handler and hide those errors:
+
+errors/error.js
+```javascript
+module.exports = function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.send(err.message);
+};
+```
+
+app.js
+```javascript
+const error = require('./errors/error');
+
+// after all routes
+app.use(error);
+```

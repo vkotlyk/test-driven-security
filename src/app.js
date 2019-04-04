@@ -22,6 +22,7 @@ const addPost = require('./routes/addPost');
 const login = require('./routes/login');
 const logout = require('./routes/logout');
 const register = require('./routes/register');
+const error = require('./errors/error');
 
 
 module.exports = async function initApp() {
@@ -50,6 +51,7 @@ module.exports = async function initApp() {
     app.post('/login', limiter(), login({users, jwtSecret: JWT_SECRET, cookieOptions: COOKIE_OPTIONS}));
     app.get('/logout', logout);
     app.post('/post', isAuthenticated, addPost(posts));
+    app.use(error);
 
     app.findUser = async (username) => {
         return await users.findOne({username});

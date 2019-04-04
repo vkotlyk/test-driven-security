@@ -280,7 +280,7 @@ describe('Node Security', function() {
         assert.deepStrictEqual(JSON.parse(listPostsResponse.text).posts, ['test post']);
     });
 
-    it.skip('Huge payload in request', async function () {
+    it('Huge payload in request', async function () {
         const bigData = times(100000, 'A');
         await login({username: bigData, password: bigData})
             .expect(413, 'request entity too large');
