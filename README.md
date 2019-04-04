@@ -538,3 +538,13 @@ Relevant test: 'NoSQL injection prevention with sanitization'
 When we run this test and set a debugger in the POST /login we'll find out
 that the attacker read the user and then the application crashed
 on bcrypt.compare.
+
+## Blind NoSQL injection with popular passwords [blind_nosql_injection]
+
+Before we fix our code let's try another attack
+
+Relevant test: 'Blind NoSQL injection with a popular password'
+
+This time we find a first user matching regex and use a [popular password](https://en.wikipedia.org/wiki/List_of_the_most_common_passwords).
+
+Instead of 400 we've just managed to log in to the victim's account.

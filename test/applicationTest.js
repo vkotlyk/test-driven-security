@@ -161,7 +161,7 @@ describe('Node Security', function() {
     it('Basic register/login/logout flow happy path', async function () {
         const cookies = await user();
 
-        await openPage({url: '/', cookies}).expect(200, /<h2>Welcome home mark<\/h2>/);
+        await openPage({url: '/', cookies}).expect(200, /<h2>Welcome home mark@gmail.com<\/h2>/);
         const {header: {location}} = await logout(cookies).expect(302);
         await openPage({url: location, cookies}).expect(200, /<h2>Welcome home <\/h2>/);
     });
@@ -295,10 +295,13 @@ describe('Node Security', function() {
             });
     });
 
-    it.skip('Blind NoSQL injection with a popular password', async function () {
+    it('Blind NoSQL injection with a popular password', async function () {
         await registered({username: 'demouser1234@gmail.com', password: '123456'});
-        await loginJSON({username: {'regex': 'demo'}, password: '123456'})
-            .expect(401, {error: 'invalid credentials'});
+        await loginJSON({username: {'$regex': 'demo'}, password: '123456'})
+            .expect(400, {
+                "error": "Username is invalid",
+                "hint": "Please use email address"
+            });
     });
 
     it.skip('Only email allowed for username', async function () {

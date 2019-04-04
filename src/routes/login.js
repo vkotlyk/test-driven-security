@@ -13,7 +13,7 @@ const login = ({users, uuid, jwtSecret, cookieOptions}) => async (req, res) => {
         res.cookie('jwt', token, {...cookieOptions, maxAge: 1 * 60 * 1000});
 
         req.session.regenerate(function(err) {
-            req.session.user = {username: username.split('@')[0]};
+            req.session.user = {username};
             res.format({
                 'text/html'() {
                     res.redirect('/');
