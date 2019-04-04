@@ -53,3 +53,18 @@ If you want to maintain low-level error message for logs use the following code:
 const debug = require('debug')('node-security');
 debug(e);
 ```
+
+## Invalid login and password feedback
+
+Currently we provide no feedback on invalid login credentials.
+
+Let's add the 'Invalid credentials' message without disclosing which part is invalid.
+
+Add this snippet to views/login.hbs:
+```javascript
+{{#if error}}
+    <h2>Try again, {{error}}</h2>
+{{/if}}
+```
+
+There should be 2 corresponding tests ('Invalid password' and 'Invalid login') that should go green.

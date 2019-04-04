@@ -172,7 +172,7 @@ describe('Node Security', function() {
         await register(DEFAULT_USER_CREDENTIALS).expect(409, /User already exists/);
     });
 
-    it.skip('Invalid password', async function () {
+    it('Invalid password', async function () {
         await registered(DEFAULT_USER_CREDENTIALS);
 
         await login({username: DEFAULT_USER_CREDENTIALS.username, password: 'invalid'})
@@ -180,11 +180,11 @@ describe('Node Security', function() {
     });
 
     async function invalidLogin() {
-        await login({username: 'invalid', password: DEFAULT_USER_CREDENTIALS.password})
-            .expect(400, /Try again, Username is invalid/);
+        await login({username: 'invalid@gmail.com', password: DEFAULT_USER_CREDENTIALS.password})
+            .expect(401, /Try again, Invalid credentials/);
     }
 
-    it.skip('Invalid login', async function () {
+    it('Invalid login', async function () {
         await invalidLogin();
     });
 
