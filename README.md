@@ -450,6 +450,11 @@ const isAuthenticated = require('./middleware/authentication')(JWT_SECRET);
 
 app.use(cookieParser());
 ```
+Cookie parse will populate req.cookies.
+Then verify method will
+check if token is valid. Please note that to verify token
+we don't need to go to a database. Everything can be done in memory
+as long as you have a secret.
 
 middleware/authentication.js
 ```javascript
@@ -479,3 +484,18 @@ We passed the same JWT_SECRET to our middleware as we used during login.
 Rune this test: 'Basic register/login/post/read posts flow happy path for SPA'.
 It deliberately simulates SPA issuing requests and not using node-security
 cookie, only jwt cookie.
+
+## Why JWT may not be a good idea for Single Page Apps sessions [jwt_critique]
+
+Please note that JWT tokens are not the most convenient solution for session management
+due to several things you have to implement yourself:
+* keeping tokens alive and refreshing them
+* revoking access by blacklisting some tokens
+* logout is tricky since tokens have expiry date
+Cookies are much simpler and just work out of the box.
+
+More:
+http://cryto.net/~joepie91/blog/2016/06/13/stop-using-jwt-for-sessions/
+http://cryto.net/~joepie91/blog/2016/06/19/stop-using-jwt-for-sessions-part-2-why-your-solution-doesnt-work/
+
+Let's swtich back to session ID based cookies.
