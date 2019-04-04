@@ -252,3 +252,43 @@ req.session.regenerate(function(err) {
 Note: if you decide to generate session IDs [yourself](https://github.com/expressjs/session#genid) please make sure
 it's difficult to guess them by the attacker.
 Preferably stick to the default express-session generator.
+
+## Persisting session across server restarts [session_store]
+
+Please note that every time we restart our server sessions are gone.
+Also if we start running our app on many servers we don't share
+session information across our backends which leads to questionable
+solutions like sticky sessions.
+Let's store our sessions in MongoDB.
+
+middleware/session.js
+```javascript
+const MongoStore = require('connect-mongo')(session);
+
+module.exports = (cookie, url) => {
+    const store = new MongoStore({url, ttl: 60 * 60});
+    const userSession = session({
+        ...
+        store
+    });
+    return {session: userSession, store};
+};
+```
+
+app.js
+```javascript
+const {session, store} = userSession(COOKIE_OPTIONS, DB);
+
+app.close = async () => {
+    await store.close();
+    await connection.close();
+};
+```
+We need to close our store same way we close our regular connection
+so that tests don't hang up.
+
+Log in to your app and restart the server. See if session is persisted.
+TTL is application specific. We go for 1h session expiry if user is inactive.
+Cat pictures website may have 1 month long sessions while bank may go for 10 minutes.
+
+Also please run all our tests to make sure we haven't introduced regression errors.
