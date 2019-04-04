@@ -1,0 +1,15 @@
+<h2>Welcome home {{{user.username}}}</h2>
+{{#if user}}
+    <form method="post" action="/post">
+        Text: <textarea name="post"></textarea>
+        <input id="submitPost" type="submit" value="Submit">
+    </form>
+{{/if}}
+<h2>Original</h2>
+<ol class="original">
+    {{#each posts}}
+        <li>{{{this}}}</li>
+    {{/each}}
+</ol>
+<a href="{{ posts.[0] }}">Click me</a>
+<button onclick="alert('liked');">Like</button>

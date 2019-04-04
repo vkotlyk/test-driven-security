@@ -1,0 +1,43 @@
+{
+  "engines": {
+    "node": "11.0.0",
+    "npm": "6.4.1"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "DEBUG=node-security node src/server.js",
+    "test": "mocha test"
+  },
+  "dependencies": {
+    "ajv": "6.10.0",
+    "ajv-errors": "1.0.1",
+    "bcryptjs": "2.4.3",
+    "body-parser": "1.18.3",
+    "connect-mongo": "2.0.3",
+    "cookie": "0.3.1",
+    "cookie-parser": "1.4.4",
+    "csurf": "1.9.0",
+    "debug": "4.1.1",
+    "dotenv": "7.0.0",
+    "express": "4.16.4",
+    "express-enforces-ssl": "1.1.0",
+    "express-rate-limit": "3.4.0",
+    "express-session": "1.15.6",
+    "hbs": "4.0.3",
+    "helmet": "3.16.0",
+    "jsonwebtoken": "8.5.1",
+    "mongodb": "3.2.2",
+    "node-esapi": "0.0.1",
+    "sanitize-html": "1.20.0",
+    "set-cookie-parser": "2.3.5",
+    "simple-oauth2": "2.2.1",
+    "uuid": "3.3.2",
+    "validator": "10.11.0",
+    "zxcvbn": "4.4.2"
+  },
+  "devDependencies": {
+    "cheerio": "1.0.0-rc.2",
+    "mocha": "6.0.2",
+    "supertest": "4.0.2"
+  }
+}
