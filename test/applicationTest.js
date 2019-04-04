@@ -180,8 +180,8 @@ describe('Node Security', function() {
     });
 
     async function invalidLogin() {
-        await login({username: 'invalid', password: DEFAULT_USER_CREDENTIALS.password})
-            .expect(400, /Try again, Username is invalid/);
+        await login({username: 'invalid@gmail.com', password: DEFAULT_USER_CREDENTIALS.password})
+            .expect(401, /Try again, Invalid credentials/);
     }
 
     it.skip('Invalid login', async function () {
