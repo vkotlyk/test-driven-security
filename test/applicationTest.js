@@ -247,7 +247,7 @@ describe('Node Security', function() {
         assert.ok(cookie1 !== cookie2);
     });
 
-    it.skip('Password hashing', async function () {
+    it('Password hashing', async function () {
         const IDENTICAL_PASSWORD = DEFAULT_USER_CREDENTIALS.password;
         await registered({username: 'mark@gmail.com', password: IDENTICAL_PASSWORD});
         await registered({username: 'sue@gmail.com', password: IDENTICAL_PASSWORD});

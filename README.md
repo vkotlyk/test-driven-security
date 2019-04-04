@@ -353,3 +353,20 @@ To set proper value for production we can change package.json
 "start": "NODE_ENV=production BCRYPT_ROUNDS=12 node src/server.js"
 ```
 
+Since bcrypt stores the number of rounds inside the hash you can increase
+the work factor without breaking existing passwords.
+All the new passwords will get the new work factor.
+
+## bcrypt and salt [bcrypt_salt]
+
+Unskip the test called 'Password hashing'.
+
+What's interesting is that 2 users with identical passwords have different hashed passwords.
+
+The reason for that is bcrypt using random salt to generate those hashes.
+Salt itself is included in the hashed password itself so salt generation
+doesn't need to leak into the user space.
+It's nicely hidden inside the bcrypt hashing algorithm.
+Good Software Design TM.
+Please note that salt doesn't require any special protection,
+it can live encoded inside your hash.
