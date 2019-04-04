@@ -8,6 +8,7 @@ const DB = 'mongodb://localhost:27017/node-security';
 const bodyParser = require('body-parser');
 const isAuthenticated = require('./middleware/authentication')();
 const userSession = require('./middleware/session');
+const limiter = require('./middleware/rateLimit');
 
 const home = require('./routes/home');
 const addPost = require('./routes/addPost');
@@ -38,7 +39,7 @@ module.exports = async function initApp() {
     app.get('/register', (req, res) => res.render('register'));
     app.post('/register', register(users));
     app.get('/login', (req, res) => res.render('login'));
-    app.post('/login', login(users));
+    app.post('/login', limiter(), login(users));
     app.get('/logout', logout);
     app.post('/post', isAuthenticated, addPost(posts));
 

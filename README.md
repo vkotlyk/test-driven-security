@@ -13,7 +13,7 @@ Step by step. I want you to understand every single line we put into the codebas
 Also we'll keep the examples minimal to capture the essence of the
 security problems without unnecessary distractions.
 
-## Setting the context
+## Setting the context [starter]
 
 You inherited an app with a simple register/login/logout flow.
 
@@ -68,3 +68,39 @@ Add this snippet to views/login.hbs:
 ```
 
 There should be 2 corresponding tests ('Invalid password' and 'Invalid login') that should go green.
+
+## Rate limit [rate_limit]
+
+Let's simulate a situation with an attacker making an excessive number of
+login attempts. We'd like to rate limit those attempts up to 10 per minute.
+In our [threat modeling](https://www.thoughtworks.com/radar/techniques/threat-modeling)
+we found that we're more concerned with an attacker trying to collect
+as many credentials as possible rather that attacking just one specific user.
+That's why we gonna rate limit based on IP, not login.
+
+We could move this capability to the infrastructure (e.g. load balancer)
+but depending on your production setup and requirements you may want to
+do it in your Node.js application.
+
+There's a failing 'Rate limit' test that should guide you.
+
+Create middleware/rateLimit.js
+```javascript
+const rateLimit = require('express-rate-limit');
+
+module.exports = () => rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 10 // limit each IP to 10 requests per windowMs
+});
+```
+In app.js:
+```javascript
+const limiter = require('./middleware/rateLimit');
+app.post('/login', limiter(), login(users));
+```
+We want to instantiate a new limiter per app invocation.
+Current rate limit has in-memory counter store, in production
+you may consider writing the counter value to a database.
+
+If you don't want to block users but slow them down instead
+there's another [module](https://www.npmjs.com/package/express-slow-down).
