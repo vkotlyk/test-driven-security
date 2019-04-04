@@ -166,7 +166,7 @@ describe('Node Security', function() {
         await openPage({url: location, cookies}).expect(200, /<h2>Welcome home <\/h2>/);
     });
 
-    it.skip('Register duplicate user failure', async function () {
+    it('Register duplicate user failure', async function () {
         await registered(DEFAULT_USER_CREDENTIALS);
 
         await register(DEFAULT_USER_CREDENTIALS).expect(409, /User already exists/);

@@ -1,5 +1,6 @@
 const userErrorPage = require('../errors/userErrorPage');
-const {BAD_REQUEST} = require('../statusCodes');
+const {CONFLICT} = require('../statusCodes');
+const debug = require('debug')('node-security');
 
 const register = users => async (req, res) => {
     const {username, password} = req.body;
@@ -7,7 +8,8 @@ const register = users => async (req, res) => {
     try {
         await users.insertOne({username, password});
     } catch(e) {
-        return userErrorPage('register', res.status(BAD_REQUEST), {error: e.message});
+        debug(e);
+        return userErrorPage('register', res.status(CONFLICT), {error: 'User already exists'});
     }
     res.format({
         'text/html'() {

@@ -38,8 +38,18 @@ Some important notes about our test:
 * we're simulating browser form submit with x-www-form-urlencoded Content-Type
 * we're sending cookies the same way browser would do it
 
-## Registration error leakage
+## Registration error leakage [registration_error]
 
 Try to register the same user twice. What error are we getting?
 
 Database errors should not leak to the user space.
+
+There's a corresponding test describing desired behavior: 'Register duplicate user failure'.
+
+Unskip the test and make it green.
+
+If you want to maintain low-level error message for logs use the following code:
+```javascript
+const debug = require('debug')('node-security');
+debug(e);
+```
