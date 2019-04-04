@@ -1,12 +1,13 @@
+const bcrypt = require('bcryptjs');
 const userErrorPage = require('../errors/userErrorPage');
 const {UNAUTHORIZED} = require('../statusCodes');
 
 const login = users => async (req, res) => {
     const {username, password} = req.body;
 
-    const user = await users.findOne({username, password});
+    const user = await users.findOne({username});
 
-    if (user) {
+    if(user && await bcrypt.compare(password, user.password)) {
         req.session.regenerate(function(err) {
             req.session.user = {username: username.split('@')[0]};
             res.format({

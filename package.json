@@ -4,8 +4,8 @@
     "npm": "6.4.1"
   },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "DEBUG=node-security node src/server.js",
+    "start": "NODE_ENV=production BCRYPT_ROUNDS=12 node src/server.js",
+    "dev": "DEBUG=node-security NODE_ENV=development BCRYPT_ROUNDS=12 node src/server.js",
     "test": "mocha test"
   },
   "dependencies": {

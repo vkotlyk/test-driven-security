@@ -292,3 +292,64 @@ TTL is application specific. We go for 1h session expiry if user is inactive.
 Cat pictures website may have 1 month long sessions while bank may go for 10 minutes.
 
 Also please run all our tests to make sure we haven't introduced regression errors.
+
+## Password hashing [bcrypt]
+
+Imagine your database with passwords leaked in a data breach.
+Even though your website may serve cat pictures, some users
+use the same password for their bank account.
+
+Note: https://haveibeenpwned.com/ has some famous data breaches.
+
+Or imagine one of your insiders impersonating user by looking up the password
+in a DB.
+
+Currently we store passwords in plain text.
+
+So we could use encryption/decryption but even better option is to use hashing
+which is a one way operation.
+
+For the hashing function we should use a slow algorithm e.g. bcrypt.
+It's one of those rare cases where slow is desirable.
+
+routes/register.js
+```javascript
+const bcrypt = require('bcryptjs');
+
+const hashedPassword = await bcrypt.hash(password, 12);
+await users.insertOne({username, password: hashedPassword});
+```
+
+routes/login.js
+```javascript
+const bcrypt = require('bcryptjs');
+
+const user = await users.findOne({username});
+if(user && await bcrypt.compare(password, user.password)) {}
+```
+
+Run all your existing tests. They are much slower now.
+
+Check the number 12 in bcrypt.hash().
+
+12 is the number of rounds. The more rounds the slower the algorithm
+and more difficult it is to brute force the attack.
+
+I found that 12 rounds takes more than 200ms and less than 1 second on my machine.
+14 rounds takes more than 1s.
+
+12 rounds = 2^12 iterations
+
+Let's speed up our tests:
+routes/register.js
+```javascript
+const HASHING_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 1;
+
+const hashedPassword = await bcrypt.hash(password, HASHING_ROUNDS);
+```
+
+To set proper value for production we can change package.json
+```
+"start": "NODE_ENV=production BCRYPT_ROUNDS=12 node src/server.js"
+```
+
