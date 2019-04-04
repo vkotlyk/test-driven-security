@@ -5,6 +5,8 @@ const path = require('path');
 
 const DB = 'mongodb://localhost:27017/node-security';
 
+require('./output/sanitizeHtml')(hbs);
+
 const bodyParser = require('body-parser');
 const isAuthenticated = require('./middleware/authentication')();
 const userSession = require('./middleware/session');

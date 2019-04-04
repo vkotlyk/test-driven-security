@@ -128,3 +128,60 @@ would try to access your cookies, local storage etc. and send
 There's a test 'XSS prevention in HTML' telling us to escape HTML content.
 
 In the views/home.hbs replace {{{}}} with {{}} to escape HTML content. It should make the test green.
+
+## Sanitizing HTML
+
+Sometimes we need to allow users to put some HTML as valid input.
+Let's allow bold and italic tags in our case and create preview list.
+
+views/home.hbs
+```
+<h2>Original</h2>
+<ol class="original">
+    {{#each posts}}
+        <li>{{this}}</li>
+    {{/each}}
+</ol>
+<h2>Preview</h2>
+<ol class="formatted">
+    {{#each posts}}
+        <li>{{{this}}}</li>
+    {{/each}}
+</ol>
+```
+
+Try to post this message:
+<b>bold</b><i>italic</i><p>paragraph</p><script>x=1</script>
+
+Same action is captured in a test called 'Whitelist allowed HTML tags'.
+
+We'd expect paragraph and script to be removed.
+
+Create output/sanitizeHtml.js
+```javascript
+const sanitizeHtml = require('sanitize-html');
+
+function addHtmlSanitization(hbs) {
+    hbs.registerHelper('sanitize', function (value) {
+        return sanitizeHtml(value, {
+            allowedTags: ['b', 'i']
+        });
+    });
+}
+
+module.exports = addHtmlSanitization;
+```
+We're extending our template engine with HTML sanitization capability.
+Please note that sanitize-html removes most tags leaving the content,
+but for the script, style and textarea everything is removed.
+
+In the hbs file update this line:
+```html
+<li>{{{sanitize this}}}</li>
+```
+
+And finally add this extension to our template engine in app.js
+```javascript
+require('./output/sanitizeHtml')(hbs);
+```
+

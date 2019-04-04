@@ -11,5 +11,11 @@
         <li>{{this}}</li>
     {{/each}}
 </ol>
+<h2>Preview</h2>
+<ol class="formatted">
+    {{#each posts}}
+        <li>{{{sanitize this}}}</li>
+    {{/each}}
+</ol>
 <a href="{{ posts.[0] }}">Click me</a>
 <button onclick="alert('liked');">Like</button>

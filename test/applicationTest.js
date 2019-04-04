@@ -210,7 +210,7 @@ describe('Node Security', function() {
             .then(responseContains('.original li', '&lt;script&gt;console.log(document.cookie)&lt;/script&gt;'));
     });
 
-    it.skip('Whitelist allowed HTML tags', async function () {
+    it('Whitelist allowed HTML tags', async function () {
         const {cookies, csrfToken} = await userWithCSRFToken();
 
         const {header: {location}} = await post({
