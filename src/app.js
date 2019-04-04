@@ -4,6 +4,9 @@ const hbs = require('hbs');
 const path = require('path');
 
 const DB = 'mongodb://localhost:27017/node-security';
+const ENV = process.env.NODE_ENV || 'development';
+const isProduction = ENV.toLowerCase() === 'production';
+const COOKIE_OPTIONS = {secure: isProduction, httpOnly: true};
 
 require('./output/sanitizeHtml')(hbs);
 
@@ -26,7 +29,7 @@ module.exports = async function initApp() {
     const db = connection.db();
     const users = db.collection('users');
     const posts = db.collection('posts');
-    const {session} = userSession();
+    const {session} = userSession(COOKIE_OPTIONS);
 
     const app = express();
     app.set("views", path.join(__dirname, "views"));

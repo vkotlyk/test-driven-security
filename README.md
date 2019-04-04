@@ -129,7 +129,7 @@ There's a test 'XSS prevention in HTML' telling us to escape HTML content.
 
 In the views/home.hbs replace {{{}}} with {{}} to escape HTML content. It should make the test green.
 
-## Sanitizing HTML
+## Sanitizing HTML [sanitizing_html]
 
 Sometimes we need to allow users to put some HTML as valid input.
 Let's allow bold and italic tags in our case and create preview list.
@@ -185,3 +185,32 @@ And finally add this extension to our template engine in app.js
 require('./output/sanitizeHtml')(hbs);
 ```
 
+## Hardening HTTP session [hardening_http_session]
+
+In the previous exercise JS could access our cookie. Let's fix it.
+
+The simplest option is to change httpOnly to true.
+But we want to also make sure that cookies are only served over HTTPS
+in production.
+
+app.js
+```javascript
+const ENV = process.env.NODE_ENV || 'development';
+const isProduction = ENV.toLowerCase() === 'production';
+const COOKIE_OPTIONS = {secure: isProduction, httpOnly: true};
+
+const {session} = userSession(COOKIE_OPTIONS);
+```
+
+middleware/session.js
+```javascript
+module.exports = cookie => {
+    const userSession = session({
+        ...
+        cookie
+    });
+    return {session: userSession};
+};
+```
+
+Unskip the following test: 'Cookie is HTTPOnly and not accessible in JS'

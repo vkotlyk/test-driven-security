@@ -224,7 +224,7 @@ describe('Node Security', function() {
             .then(responseContains('.formatted li', '<b>bold</b><i>italic</i>paragraph'));
     });
 
-    it.skip('Cookie is HTTPOnly and not accessible in JS', async function () {
+    it('Cookie is HTTPOnly and not accessible in JS', async function () {
         const cookies = await user();
 
         const parsedCookie = cookies[SESSION_COOKIE_NAME];
