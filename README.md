@@ -571,14 +571,8 @@ input/validateCredentials.js
 const validator = require('validator');
 
 function validateCredentials({username, password}) {
-    if (typeof username !== "string" || !validator.isEmail(String(username))) {
+    if (!validator.isEmail(String(username))) {
         return {error: "Username is invalid", hint: "Please use email address"};
-    }
-    if (typeof password !== "string") {
-        return {error: "Password is invalid", hint: "Please use a string value"};
-    }
-    if (!validator.isLength(password, {max: 128})) {
-        return {error: "Password is invalid", hint: "Please use a password up to 256 characters"};
     }
 }
 
@@ -646,3 +640,19 @@ if (passwordStrength.score <= 1) {
 ```
 
 Run all tests. One of the old tests shouldn't make sense any more so remove it.
+
+## JSON pollution
+
+What if the username is not a string but e.g. {}?
+What about a scenario when username is a malicious object with toString?
+What if our input JSON is null or some other primitive value?
+
+JSON body parser by default is in so-called [strict mode](https://github.com/expressjs/body-parser#strict)
+and only allows for objects and arrays.
+
+Make sure that POST /login has it's input validated.
+Posts should not allow longer string than 140 characters.
+
+One final note: when using query params or HTML forms we can also
+prepare non string input by sending same param multiple times.
+It's then parsed by express and an array.
