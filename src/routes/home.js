@@ -1,6 +1,6 @@
-const home = posts => async function renderListPage(req, res) {
+const home = posts => async function renderListPage(error, req, res) {
     const postsList = await posts.find({}).sort({_id: -1}).limit(10).toArray();
-    const postsViewModel = {posts: postsList.map(p => p.text)};
+    const postsViewModel = {posts: postsList.map(p => p.text), error};
 
     res.format({
         'text/html'() {

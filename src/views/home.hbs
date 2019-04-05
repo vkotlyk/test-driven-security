@@ -1,5 +1,8 @@
 <h2>Welcome home {{user.username}}</h2>
 {{#if user}}
+    {{#if error}}
+        <h2 class="post-submission-error">{{error}}</h2>
+    {{/if}}
     <form method="post" action="/post">
         Text: <textarea name="post"></textarea>
         <input id="submitPost" type="submit" value="Submit">

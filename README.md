@@ -669,3 +669,83 @@ function validateCredentials({username, password}) {
 Note: when using query params or HTML forms we can also
 prepare non string input by sending same param multiple times.
 It's then parsed by express and an array.
+
+## Input validation with schema validators [schema_validator]
+
+Make sure that POST /login has it's input validated too.
+Posts should not allow longer string than 140 characters.
+This time we'll see how to use schema based validators.
+
+'Post validation with JSON schema' test is our guide.
+
+input/validatePost.js
+```javascript
+const Ajv = require('ajv');
+const AjvErrors = require('ajv-errors');
+
+const ajv = new Ajv({allErrors: true, jsonPointers: true});
+AjvErrors(ajv, {singleError: true});
+const schema = {
+    title: 'PostSubmission',
+    properties: {
+        post: {type: 'string', minLength: 1, maxLength: 140}
+    },
+    additionalProperties: false,
+    required: ['post'],
+    errorMessage: 'Please use between 1 and 140 characters'
+};
+const validatePost = ajv.compile(schema);
+
+module.exports = validatePost;
+```
+We use ajv since it's based on JSON Schema standard and works
+both client and server side.
+We also added ajv-errors extension to support custom error messages.
+
+routes/addPost.js
+```javascript
+const addPost = ({posts, renderListPage}) => async (req, res) => {
+    const {post} = req.body;
+    const valid = validatePost({post});
+    if(!valid) {
+        const errorMsg = validatePost.errors.map(error => error.message).join(',');
+        res.status(400);
+        await renderListPage(errorMsg, req, res);
+    } else {
+        await posts.insertOne({text: post});
+        res.redirect('/');
+    }
+
+};
+
+module.exports = addPost;
+```
+We use Post/Redirect/Get pattern only on success.
+On error we return 400 and render list page with errors.
+renderListPage is a function we inject to render the same page that triggered
+the request.
+
+Where does renderListPage come from?
+routes/home.js
+```
+const home = posts => async function renderListPage(error, req, res) {
+    const postsViewModel = {..., error};
+
+
+};
+```
+We allow errors to be injected into our home route and propagete them to
+views/home.hbs
+```html
+{{#if error}}
+    <h2 class="post-submission-error">{{error}}</h2>
+{{/if}}
+```
+
+And now we can combine all of this in app.js
+```javascript
+const renderListPage = home(posts);
+
+app.get('/', (req, res) => renderListPage(null, req, res));
+app.post('/post', isAuthenticated, addPost({posts, renderListPage}));
+```

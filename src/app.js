@@ -33,6 +33,7 @@ module.exports = async function initApp() {
     const users = db.collection('users');
     const posts = db.collection('posts');
     const {session, store} = userSession(COOKIE_OPTIONS, DB);
+    const renderListPage = home(posts);
 
     const app = express();
     app.set("views", path.join(__dirname, "views"));
@@ -44,13 +45,13 @@ module.exports = async function initApp() {
     app.use(bodyParser.json());
     app.use(express.static(__dirname + '/public'));
 
-    app.get('/', home(posts));
+    app.get('/', (req, res) => renderListPage(null, req, res));
     app.get('/register', (req, res) => res.render('register'));
     app.post('/register', register(users));
     app.get('/login', (req, res) => res.render('login'));
     app.post('/login', limiter(), login({users, jwtSecret: JWT_SECRET, cookieOptions: COOKIE_OPTIONS}));
     app.get('/logout', logout);
-    app.post('/post', isAuthenticated, addPost(posts));
+    app.post('/post', isAuthenticated, addPost({posts, renderListPage}));
     app.use(error);
 
     app.findUser = async (username) => {

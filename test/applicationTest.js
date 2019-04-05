@@ -357,14 +357,14 @@ describe('Node Security', function () {
         await loginJSON(false).expect(400, "Unexpected token f in JSON at position 0");
     });
 
-    it.skip('Post validation with JSON schema', async function () {
-        const {cookies, csrfToken} = await userWithCSRFToken();
+    it('Post validation with JSON schema', async function () {
+        const cookies = await user();
 
-        await post({cookies, csrfToken, msg: ''}).expect(400, /Please use between 1 and 140 characters/);
-        await post({cookies, csrfToken, msg: 'a'}).expect(302);
-        await post({cookies, csrfToken, msg: times(140, 'a')}).expect(302);
-        await post({cookies, csrfToken, msg: times(141, 'a')}).expect(400, /Please use between 1 and 140 characters/);
-        await postJSON({cookies, csrfToken, msg: {}}).expect(400, /Please use between 1 and 140 characters/);
+        await post({cookies, msg: ''}).expect(400, /Please use between 1 and 140 characters/);
+        await post({cookies, msg: 'a'}).expect(302);
+        await post({cookies, msg: times(140, 'a')}).expect(302);
+        await post({cookies, msg: times(141, 'a')}).expect(400, /Please use between 1 and 140 characters/);
+        await postJSON({cookies, msg: {}}).expect(400, /Please use between 1 and 140 characters/);
     });
 
     it.skip('Context aware XSS', async function () {
