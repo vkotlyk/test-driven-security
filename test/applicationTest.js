@@ -367,10 +367,10 @@ describe('Node Security', function () {
         await postJSON({cookies, msg: {}}).expect(400, /Please use between 1 and 140 characters/);
     });
 
-    it.skip('Context aware XSS', async function () {
-        const {cookies, csrfToken} = await userWithCSRFToken();
+    it('Context aware XSS', async function () {
+        const cookies = await user();
 
-        await post({cookies, csrfToken, msg: 'javascript:alert(1)'});
+        await post({cookies, msg: 'javascript:alert(1)'});
 
         await openPage({url: '/', cookies}).expect(200, /href="javascript%3Aalert%281%29"/);
     });

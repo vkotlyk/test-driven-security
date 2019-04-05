@@ -10,6 +10,7 @@ const COOKIE_OPTIONS = {secure: isProduction, httpOnly: true};
 const JWT_SECRET = process.env.JWT_SECRET || 'jwtsecret';
 
 require('./output/sanitizeHtml')(hbs);
+require('./output/encodeURL')(hbs);
 
 const bodyParser = require('body-parser');
 const isAuthenticated = require('./middleware/authentication')(JWT_SECRET);

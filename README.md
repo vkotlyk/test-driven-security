@@ -749,3 +749,52 @@ const renderListPage = home(posts);
 app.get('/', (req, res) => renderListPage(null, req, res));
 app.post('/post', isAuthenticated, addPost({posts, renderListPage}));
 ```
+
+## XSS strikes back - context aware encoding [context_aware_encoding]
+
+Many people assume that once they use {{}} in a template engine we're safe.
+
+
+Add the following post:
+```javascript:alert(1)```
+And try to click on click me link below.
+
+It turns our that most template engines can only encode HTML content by default.
+But if you put user generated content into CSS, JS, URLs, HTML attributes or base64
+you have to use context aware encoding. Every <script> or <style> tag is a different
+execution context with it's own context specific rules and encodings.
+
+Let's see a test describing this problem: 'Context aware XSS'
+
+We need to enhance handlebars with link encoding.
+
+output/encodeURL.js
+```javascript
+const ESAPI = require('node-esapi');
+
+function addURLEncoding(hbs) {
+    hbs.registerHelper('link', function (value, options) {
+        return ESAPI.encoder().encodeForURL(value);
+    });
+}
+
+module.exports = addURLEncoding;
+```
+We created a link helper for our template engine to encode all URLs.
+Please note that ESAPI provides other contextual methods like:
+encodeForHTML,encodeForCSS,encodeForJS,encodeForHTMLAttribute,encodeForBase64
+
+Now let's apply our new helper
+
+views/home.hbs
+```
+<a href="{{ link posts.[0] }}">Click me</a>
+```
+
+And add it to app.js
+```javascript
+require('./output/encodeURL')(hbs);
+```
+
+To summarize then encoding part remember to store use content in the raw format
+and encode it at rendering time depending on context.
