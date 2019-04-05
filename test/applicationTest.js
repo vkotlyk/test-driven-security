@@ -295,7 +295,7 @@ describe('Node Security', function () {
             });
     });
 
-    it('Blind NoSQL injection with a popular password', async function () {
+    it.skip('Blind NoSQL injection with a popular password', async function () {
         await registered({username: 'demouser1234@gmail.com', password: '123456'});
         await loginJSON({username: {'$regex': 'demo'}, password: '123456'})
             .expect(400, {
@@ -310,7 +310,7 @@ describe('Node Security', function () {
 
     });
 
-    it.skip('Weak password strength not allowed', async function () {
+    it('Weak password strength not allowed', async function () {
         await register({username: DEFAULT_USER_CREDENTIALS.username, password: 'pass'})
             .expect(400).expect(/Password too week/).expect(/Add another word or two. Uncommon words are better./);
     });

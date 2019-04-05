@@ -623,3 +623,26 @@ views/register.hbs
     <p class="registration-hint">{{hint}}</p>
 {{/if}}
 ```
+
+## Password policy [password_policy]
+
+[XKCD](https://xkcd.com/936/) nicely summarizes problems with modern password requirements.
+
+Let's add password strength check to our registration so that only strong enough
+passwords are allowed.
+
+'Weak password strength not allowed' test will guide us.
+
+routes/register.js
+```javascript
+const estimatePasswordStrength = require('zxcvbn');
+
+const passwordStrength = estimatePasswordStrength(password);
+
+if (passwordStrength.score <= 1) {
+    const error = {error: "Password too week", hint: passwordStrength.feedback.suggestions.join(' ')};
+    return userErrorPage('register', res.status(BAD_REQUEST), error);
+}
+```
+
+Run all tests. One of the old tests shouldn't make sense any more so remove it.
