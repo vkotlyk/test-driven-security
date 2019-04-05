@@ -315,14 +315,6 @@ describe('Node Security', function () {
             .expect(400).expect(/Password too week/).expect(/Add another word or two. Uncommon words are better./);
     });
 
-    it.skip('Context aware XSS', async function () {
-        const {cookies, csrfToken} = await userWithCSRFToken();
-
-        await post({cookies, csrfToken, msg: 'javascript:alert(1)'});
-
-        await openPage({url: '/', cookies}).expect(200, /href="javascript%3Aalert%281%29"/);
-    });
-
     it.skip('JSON pollution in register', async function () {
         await registerJSON({username: {}}).expect(400, {
             "error": "Username is invalid",
@@ -375,8 +367,12 @@ describe('Node Security', function () {
         await postJSON({cookies, csrfToken, msg: {}}).expect(400, /Please use between 1 and 140 characters/);
     });
 
-    it.skip('Content Security Policy (CSP)', async function () {
-        await checkHeader('content-security-policy', "default-src 'self'; style-src https://cdnjs.cloudflare.com; require-sri-for style");
+    it.skip('Context aware XSS', async function () {
+        const {cookies, csrfToken} = await userWithCSRFToken();
+
+        await post({cookies, csrfToken, msg: 'javascript:alert(1)'});
+
+        await openPage({url: '/', cookies}).expect(200, /href="javascript%3Aalert%281%29"/);
     });
 
     it.skip('CSRF token generation', async function () {
@@ -438,6 +434,10 @@ describe('Node Security', function () {
 
     it.skip('Prevent HTTP downgrade when already on HTTPS (HSTS)', async function () {
         await checkHeader('strict-transport-security', 'max-age=15552000; includeSubDomains');
+    });
+
+    it.skip('Content Security Policy (CSP)', async function () {
+        await checkHeader('content-security-policy', "default-src 'self'; style-src https://cdnjs.cloudflare.com; require-sri-for style");
     });
 
     it.skip('OAuth2: Prepare Github authorize path', async function () {
