@@ -798,3 +798,26 @@ require('./output/encodeURL')(hbs);
 
 To summarize then encoding part remember to store use content in the raw format
 and encode it at rendering time depending on context.
+
+## Cross Site Request Forgery (CSRF/XSRF) [csrf]
+
+Let's simulate CSRF attack.
+
+We'll run another website from the attacker directory.
+
+```
+node attacker/server.js
+```
+
+Start our website (localhost:3000) and log in as a genuine user.
+
+Now go to localhost:3001 and open 'Basic CSRF' link and submit a form.
+Attacker embedded a form to our genuine website on its website.
+
+To see a more subtle attack that requires nothing by opening a link go to
+a 'Script CSRF' link. This time JS submits the form with no user action.
+But it's still evident that the attack happened because we're being redirected
+to the genuine page.
+
+Go to the 'Iframe CSRF' link now and see how we can make it invisible to the
+victim that we've just run the attack.
