@@ -641,18 +641,31 @@ if (passwordStrength.score <= 1) {
 
 Run all tests. One of the old tests shouldn't make sense any more so remove it.
 
-## JSON pollution
+## JSON pollution [json_pollution]
 
-What if the username is not a string but e.g. {}?
-What about a scenario when username is a malicious object with toString?
+What if the username/password is not a string but e.g. {}?
+What about a scenario when username/password is a malicious object with toString?
 What if our input JSON is null or some other primitive value?
+
+'JSON pollution in register' and 'JSON pollution in login' have those cases covered.
 
 JSON body parser by default is in so-called [strict mode](https://github.com/expressjs/body-parser#strict)
 and only allows for objects and arrays.
+But once we get and object and array we need to exclude those since we expect
+a string. validator.js works on strings.
 
-Make sure that POST /login has it's input validated.
-Posts should not allow longer string than 140 characters.
+input/validateCredentials.js
+```javascript
+function validateCredentials({username, password}) {
+    if (typeof username !== 'string' || !validator.isEmail(username)) {
+        return {error: "Username is invalid", hint: "Please use email address"};
+    }
+    if (typeof password !== "string") {
+        return {error: "Password is invalid", hint: "Please use a string value"};
+    }
+}
+```
 
-One final note: when using query params or HTML forms we can also
+Note: when using query params or HTML forms we can also
 prepare non string input by sending same param multiple times.
 It's then parsed by express and an array.

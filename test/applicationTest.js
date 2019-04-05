@@ -315,7 +315,7 @@ describe('Node Security', function () {
             .expect(400).expect(/Password too week/).expect(/Add another word or two. Uncommon words are better./);
     });
 
-    it.skip('JSON pollution in register', async function () {
+    it('JSON pollution in register', async function () {
         await registerJSON({username: {}}).expect(400, {
             "error": "Username is invalid",
             "hint": "Please use email address"
@@ -336,7 +336,7 @@ describe('Node Security', function () {
         await registerJSON(false).expect(400, "Unexpected token f in JSON at position 0");
     });
 
-    it.skip('JSON pollution in login', async function () {
+    it('JSON pollution in login', async function () {
         await loginJSON({username: {}}).expect(400, {
             "error": "Username is invalid",
             "hint": "Please use email address"
