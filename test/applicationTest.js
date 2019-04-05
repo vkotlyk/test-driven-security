@@ -368,9 +368,9 @@ describe('Node Security', function() {
     });
 
     it.skip('Context aware XSS', async function () {
-        const {cookies, csrfToken} = await userWithCSRFToken();
+        const cookies = await user();
 
-        await post({cookies, csrfToken, msg: 'javascript:alert(1)'});
+        await post({cookies, msg: 'javascript:alert(1)'});
 
         await openPage({url: '/', cookies}).expect(200, /href="javascript%3Aalert%281%29"/);
     });
