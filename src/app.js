@@ -13,6 +13,7 @@ require('./output/sanitizeHtml')(hbs);
 require('./output/encodeURL')(hbs);
 
 const bodyParser = require('body-parser');
+const csrf = require('csurf')();
 const isAuthenticated = require('./middleware/authentication')(JWT_SECRET);
 const userSession = require('./middleware/session');
 const cookieParser = require('cookie-parser');
@@ -46,13 +47,13 @@ module.exports = async function initApp() {
     app.use(bodyParser.json());
     app.use(express.static(__dirname + '/public'));
 
-    app.get('/', (req, res) => renderListPage(null, req, res));
+    app.get('/', csrf, (req, res) => renderListPage(null, req, res));
     app.get('/register', (req, res) => res.render('register'));
     app.post('/register', register(users));
     app.get('/login', (req, res) => res.render('login'));
     app.post('/login', limiter(), login({users, jwtSecret: JWT_SECRET, cookieOptions: COOKIE_OPTIONS}));
     app.get('/logout', logout);
-    app.post('/post', isAuthenticated, addPost({posts, renderListPage}));
+    app.post('/post', isAuthenticated, csrf, addPost({posts, renderListPage}));
     app.use(error);
 
     app.findUser = async (username) => {

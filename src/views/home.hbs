@@ -4,6 +4,7 @@
         <h2 class="post-submission-error">{{error}}</h2>
     {{/if}}
     <form method="post" action="/post">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         Text: <textarea name="post"></textarea>
         <input id="submitPost" type="submit" value="Submit">
     </form>

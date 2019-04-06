@@ -267,7 +267,7 @@ describe('Node Security', function () {
         assert.ok(jwtCookie.maxAge, 60);
     });
 
-    it('Basic register/login/post/read posts flow happy path for SPA', async function () {
+    it.skip('Basic register/login/post/read posts flow happy path for SPA', async function () {
         await registerJSON(DEFAULT_USER_CREDENTIALS).expect(200, '"Registered"');
         const loginResponse = await loginJSON(DEFAULT_USER_CREDENTIALS).expect(200, '"Success"');
         const {jwt} = extractSetCookies(loginResponse);
@@ -358,24 +358,24 @@ describe('Node Security', function () {
     });
 
     it('Post validation with JSON schema', async function () {
-        const cookies = await user();
+        const {cookies, csrfToken} = await userWithCSRFToken();
 
-        await post({cookies, msg: ''}).expect(400, /Please use between 1 and 140 characters/);
-        await post({cookies, msg: 'a'}).expect(302);
-        await post({cookies, msg: times(140, 'a')}).expect(302);
-        await post({cookies, msg: times(141, 'a')}).expect(400, /Please use between 1 and 140 characters/);
-        await postJSON({cookies, msg: {}}).expect(400, /Please use between 1 and 140 characters/);
+        await post({cookies, csrfToken, msg: ''}).expect(400, /Please use between 1 and 140 characters/);
+        await post({cookies, csrfToken, msg: 'a'}).expect(302);
+        await post({cookies, csrfToken, msg: times(140, 'a')}).expect(302);
+        await post({cookies, csrfToken, msg: times(141, 'a')}).expect(400, /Please use between 1 and 140 characters/);
+        await postJSON({cookies, csrfToken, msg: {}}).expect(400, /Please use between 1 and 140 characters/);
     });
 
     it('Context aware XSS', async function () {
-        const cookies = await user();
+        const {cookies, csrfToken} = await userWithCSRFToken();
 
-        await post({cookies, msg: 'javascript:alert(1)'});
+        await post({cookies, csrfToken, msg: 'javascript:alert(1)'});
 
         await openPage({url: '/', cookies}).expect(200, /href="javascript%3Aalert%281%29"/);
     });
 
-    it.skip('CSRF token generation', async function () {
+    it('CSRF token generation', async function () {
         const cookies = await user();
 
         const csrfToken = await obtainCSRFToken(cookies);
@@ -383,7 +383,7 @@ describe('Node Security', function () {
         assert.ok(csrfToken);
     });
 
-    it.skip('Reject requests without CSRF token', async function () {
+    it('Reject requests without CSRF token', async function () {
         const {cookies, csrfToken} = await userWithCSRFToken();
 
         await post({cookies, csrfToken: '', msg: 'irrelevant'}).expect(403);

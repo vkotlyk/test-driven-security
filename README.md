@@ -821,3 +821,52 @@ to the genuine page.
 
 Go to the 'Iframe CSRF' link now and see how we can make it invisible to the
 victim that we've just run the attack.
+
+## CSRF protection with token [csrf_token]
+
+Let those two tests guide our implementation:
+'CSRF token generation', 'Reject requests without CSRF token'.
+
+We want CSRF token to be added to the POST submission form.
+app.js
+```javascript
+const csrf = require('csurf')();
+
+app.get('/', csrf, (req, res) => renderListPage(null, req, res));
+```
+We need to import CSRF token generation middleware.
+It will enhance request object with the token generation capability.
+
+Now we can add a token to our view model.
+
+routes/home.js
+```javascript
+const postsViewModel = {posts: postsList.map(p => p.text), csrfToken: req.csrfToken()};
+```
+
+Finally let's propagete csrfToken to our template
+
+views/home.hbs
+```html
+<input type="hidden" name="_csrf" value="{{csrfToken}}">
+```
+
+At this point 'CSRF token generation' should go green.
+
+Now back to app.js
+```
+app.post('/post', isAuthenticated, csrf, addPost({posts, renderListPage}));
+```
+Same csrf middleware applied to POST requests will check if CSRF token
+is valid.
+This should be enough to make 'Reject requests without CSRF token' green.
+
+Check all other tests. Fix broken tests.
+Hint:
+```javascript
+const {cookies, csrfToken} = await userWithCSRFToken();
+
+await post({cookies, csrfToken, msg});
+```
+For now we can skip 'Basic register/login/post/read posts flow happy path for SPA'.
+We'll fix it later.
