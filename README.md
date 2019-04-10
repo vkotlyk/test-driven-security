@@ -1390,3 +1390,27 @@ const callback = async (req, res) => {
 ```
 
 Test it with 'OAuth2: exchange code for token' and manually in your browser.
+
+### Unhappy path: incorrect or expired token [oauth_incorrect_code]
+
+Run this test: 'OAuth2: incorrect or expired code'
+
+We should not authorize users with incorrect or invalid token.
+
+routes/github.js
+```javascript
+const userErrorPage = require('../errors/userErrorPage');
+const {UNAUTHORIZED} = require('../statusCodes');
+
+function githubAuthenticationError(res) {
+    return userErrorPage('login', res.status(UNAUTHORIZED), {error: 'Authentication with Github failed'});
+}
+
+if(access_token) {
+    req.session.regenerate(function (err) {
+        ...
+    });
+} else {
+    return githubAuthenticationError(res);
+}
+```
