@@ -501,10 +501,13 @@ describe('Node Security', function() {
 
     it.skip('Prevent DoS with password limit', async function () {
         this.timeout(2000);
+        const veryBigData = times(1000, 'A');
         const bigData = times(129, 'A');
         const mediumData = times(128, '💩'); // '💩'.length === 2
+        await register({username: DEFAULT_USER_CREDENTIALS.username, password: veryBigData})
+            .expect(400, /Please use a password up to 128 characters/);
         await register({username: DEFAULT_USER_CREDENTIALS.username, password: bigData})
-            .expect(400, /Please use a password up to 256 characters/);
+            .expect(400, /Please use a password up to 128 characters/);
         await register({username: DEFAULT_USER_CREDENTIALS.username, password: mediumData})
             .expect(400, /Password too week/);
     });
