@@ -445,7 +445,7 @@ describe('Node Security', function() {
         const response = await request.get('/auth').expect(302);
 
         assert.deepStrictEqual(response.header.location,
-            'https://github.com/login/oauth/authorize?response_type=code&client_id=github_client_id&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=read%3Auser&state=1234');
+            'https://github.com/login/oauth/authorize?response_type=code&client_id=github_client_id&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=read%3Auser');
     });
 
     function oauthFlow(state) {
