@@ -7,6 +7,7 @@ const DEFAULT_USER_CREDENTIALS = {username: 'mark@gmail.com', password: 'correct
 const SESSION_COOKIE_NAME = 'node-security';
 const OAUTH_CODE = '8f822999c6173a16cb46';
 const STATE = '1234';
+const uuid = () => STATE;
 
 function times(n, character) {
     return Array(n + 1).join(character);
@@ -31,7 +32,7 @@ describe('Node Security', function() {
     let app, request;
 
     beforeEach(async () => {
-        app = await require('../src/app.js')();
+        app = await require('../src/app.js')({uuid});
         await app.clean();
         request = httpClient(app);
     });
