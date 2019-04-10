@@ -7,6 +7,9 @@ function validateCredentials({username, password}) {
     if (typeof password !== "string") {
         return {error: "Password is invalid", hint: "Please use a string value"};
     }
+    if (!validator.isLength(password, {max: 128})) {
+        return {error: "Password is invalid", hint: "Please use a password up to 128 characters"};
+    }
 }
 
 module.exports = validateCredentials;

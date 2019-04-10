@@ -1589,3 +1589,27 @@ const serverError = require('./errors/500');
 app.use(notFound);
 app.use(serverError);
 ```
+
+## Denial of Service [dos]
+
+Password strength estimation is CPU heavy process.
+Due to single threaded nature of JS it's not good to have CPU heavy computations.
+If we allow very long password it may get slow.
+
+Let's set max password length to 128 characters to avoid creating
+unreasonable limits on password length.
+
+input/validateCredentials.js
+```javascript
+if (!validator.isLength(password, {max: 128})) {
+    return {error: "Password is invalid", hint: "Please use a password up to 128 characters"};
+}
+```
+
+On my machine it still takes about 300ms to estimate strength of 128 character password.
+You may consider estimating only the first 50 characters instead or move
+the estimation to the browser.
+
+If you're wondering about email length limitations there's a limit of 254
+characters but since we use a library function for email validation
+it's already taken care of.
