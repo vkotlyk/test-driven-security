@@ -599,7 +599,7 @@ When user tries to register we want to provide feedback why it may be failing.
 Add the same validation to register.
 
 routes/register.js
-```
+```javascript
 const {CONFLICT, BAD_REQUEST} = require('../statusCodes');
 const validateCredentials = require('../input/validateCredentials');
 
@@ -727,7 +727,7 @@ the request.
 
 Where does renderListPage come from?
 routes/home.js
-```
+```javascript
 const home = posts => async function renderListPage(error, req, res) {
     const postsViewModel = {..., error};
 
