@@ -19,6 +19,7 @@ const isAuthenticated = require('./middleware/authentication')(JWT_SECRET);
 const userSession = require('./middleware/session');
 const cookieParser = require('cookie-parser');
 const limiter = require('./middleware/rateLimit');
+const helmet = require('helmet');
 
 const home = require('./routes/home');
 const addPost = require('./routes/addPost');
@@ -42,6 +43,7 @@ module.exports = async function initApp({uuid}) {
     app.set("views", path.join(__dirname, "views"));
     app.set("view engine", "hbs");
 
+    app.use(helmet());
     app.use(cookieParser());
     app.use(session);
     app.use(bodyParser.urlencoded({extended: false}));

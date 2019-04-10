@@ -417,19 +417,19 @@ describe('Node Security', function () {
         assert.deepStrictEqual(cookies['jwt'].sameSite, 'Strict');
     });
 
-    it.skip('Obfuscate your tech stack', async function () {
+    it('Obfuscate your tech stack', async function () {
         await checkHeader('x-powered-by', undefined);
     });
 
-    it.skip('Disable browser DNS prefetching', async function () {
+    it('Disable browser DNS prefetching', async function () {
         await checkHeader('x-dns-prefetch-control', 'off');
     });
 
-    it.skip('Prevent clickjacking from an iframe', async function () {
+    it('Prevent clickjacking from an iframe', async function () {
         await checkHeader('x-frame-options', 'SAMEORIGIN');
     });
 
-    it.skip('Prevent browser from guessing MIME type', async function () {
+    it('Prevent browser from guessing MIME type', async function () {
         await checkHeader('x-content-type-options', 'nosniff');
     });
 

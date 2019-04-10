@@ -990,3 +990,49 @@ This [tool](https://localtunnel.github.io/www/) may come in handy.
 * lt --port 3001
 * go to the newly created URL and try the CSRF attack
 
+## Hardening HTTP headers (helmet)
+
+Helmet library provides sane defaults for the security related HTTP headers.
+
+Add helmet middleware before all other middleware.
+```javascript
+const helmet = require('helmet');
+
+app.use(helmet());
+```
+
+### Obfuscate your tech stack
+
+By default Express adds X-Powered-By that we can remove with helmet.
+
+Note: server fingerprinting can be done with session name (connect.sid unless changed),
+ETag format (unspecified in the HTTP spec and framework specific), default error pages format.
+
+### Prevent DNS Prefetch
+
+DNS Prefetch allows other websites to DNS prefetch our domain for performance reasons.
+Security wise, it may appear as if some users are visiting our website even if they are not.
+
+Since we're more focused on security here let's allow helmet to disable
+DNS prefetching.
+
+### Prevent clickjacking
+
+X-Frame-Options: SAMEORIGIN prevents our website from loading inside
+iframes from other domains. So the attacker can't position our website
+behind their content and trick us into clicking controls on our own website.
+
+You can open our attacker code with clickjacking example.
+
+Please note that we didn't DENY our website to load from same domain iframes.
+
+### Prevent browser from sniffing MIME type
+
+We want browsers to respect Content-Type header from server and not guess
+what's being served by looking at the content itself.
+
+### Beware X-XSS-Protection header
+
+This header is a misnomer since it provides very little XSS protection
+and you should use other techniques we used before.
+
