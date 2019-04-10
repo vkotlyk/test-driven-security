@@ -1206,6 +1206,11 @@ Firefox doesn't recognize it.
 
 Fix 'Content Security Policy (CSP)' test.
 
+Note: There's a similar experimental feature from Node 11.8.0 for
+npm loaded resources
+
+More: https://snyk.io/blog/introducing-experimental-integrity-policies-to-node-js
+
 ## OAuth2
 
 Handling passwords ourselves is too much hassle. What's more people
