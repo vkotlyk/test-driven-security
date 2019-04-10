@@ -990,7 +990,7 @@ This [tool](https://localtunnel.github.io/www/) may come in handy.
 * lt --port 3001
 * go to the newly created URL and try the CSRF attack
 
-## Hardening HTTP headers (helmet)
+## Hardening HTTP headers [helmet]
 
 Helmet library provides sane defaults for the security related HTTP headers.
 
@@ -1050,3 +1050,15 @@ Let's use Heroku to do the heavy lifting for us.
 
 My deployed app: https://node-sec.herokuapp.com/
 
+## Prevent HTTPS downgrade with HTTP Strict-Transport-Security (HSTS) [hsts]
+
+Open the app over HTTPS and then try to change the protocol to HTTP.
+
+Strict-Transport-Security header should prevent you from HTTPS downgrade.
+
+We also have a corresponding mocha test for it.
+
+Note: upgrading to HTTPS is a nontrivial step since many resources
+that your main pages reference may still be available only over HTTP
+(e.g. ads, user submitted links). Browsers will refuse to load HTTP
+content from HTTPS resources.

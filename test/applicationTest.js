@@ -433,7 +433,7 @@ describe('Node Security', function () {
         await checkHeader('x-content-type-options', 'nosniff');
     });
 
-    it.skip('Prevent HTTP downgrade when already on HTTPS (HSTS)', async function () {
+    it('Prevent HTTP downgrade when already on HTTPS (HSTS)', async function () {
         await checkHeader('strict-transport-security', 'max-age=15552000; includeSubDomains');
     });
 
