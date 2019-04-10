@@ -481,12 +481,12 @@ describe('Node Security', function () {
         assert.deepStrictEqual(githubOauth.getToken.invokedWith, OAUTH_CODE);
     });
 
-    it.skip('OAuth2: provider error', async function () {
+    it('OAuth2: provider error', async function () {
         githubOauth.getToken = args => {
             githubOauth.getToken.invokedWith = args;
             return Promise.reject("Github error");
         };
-        await oauthFlow(STATE)(401, /Authentication with Github failed/);
+        await oauthFlow(STATE)(502, /Github authentication is temporarily down/);
 
         assert.deepStrictEqual(githubOauth.getToken.invokedWith, OAUTH_CODE);
     });

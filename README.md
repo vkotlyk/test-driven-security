@@ -1414,3 +1414,25 @@ if(access_token) {
     return githubAuthenticationError(res);
 }
 ```
+
+### Unhappy path: Oauth provider error [oauth_provider_error]
+
+Let's simulate github oauth going down with the following test:
+'OAuth2: provider error'
+
+routes/github.js
+```javascript
+const {UNAUTHORIZED, BAD_GATEWAY} = require('../statusCodes');
+
+function githubGatewayError(res) {
+    return userErrorPage('login', res.status(BAD_GATEWAY), {error: 'Github authentication is temporarily down'});
+}
+
+const callback = async (req, res) => {
+    try {
+        ...
+    } catch(e) {
+        return githubGatewayError(res);
+    }
+};
+```
