@@ -482,7 +482,7 @@ describe('Node Security', function() {
             githubOauth.getToken.invokedWith = args;
             return Promise.reject("Github error");
         };
-        await oauthFlow(STATE)(401, /Authentication with Github failed/);
+        await oauthFlow(STATE)(502, /Github authentication is temporarily down/);
 
         assert.deepStrictEqual(githubOauth.getToken.invokedWith, OAUTH_CODE);
     });
