@@ -22,7 +22,7 @@ function toRequestCookie({name, value}) {
 }
 
 function extractSetCookies(result) {
-    const pairs = result.header['set-cookie'].map(cookie => setCookieParser.parse(cookie)[0]).map(parsedCookie => ([parsedCookie.name, parsedCookie]));
+    const pairs = (result.header['set-cookie'] || []).map(cookie => setCookieParser.parse(cookie)[0]).map(parsedCookie => ([parsedCookie.name, parsedCookie]));
     return pairs.reduce((acc, [name, cookie]) => ({...acc, [name]: cookie}), {});
 }
 
@@ -464,7 +464,7 @@ describe('Node Security', function() {
         const callbackResponse = await oauthFlow(STATE)(302, /Found/);
         await openPage({url: callbackResponse.header.location, cookies: extractSetCookies(callbackResponse)}).expect(200, /github user/);
 
-        assert.deepStrictEqual(githubOauth.getToken.invokedWith, {code: OAUTH_CODE});
+        assert.deepStrictEqual(githubOauth.getToken.invokedWith, OAUTH_CODE);
     });
 
     it.skip('OAuth2: incorrect or expired code', async function () {
@@ -474,7 +474,7 @@ describe('Node Security', function() {
         };
         await oauthFlow(STATE)(401, /Authentication with Github failed/);
 
-        assert.deepStrictEqual(githubOauth.getToken.invokedWith, {code: OAUTH_CODE});
+        assert.deepStrictEqual(githubOauth.getToken.invokedWith, OAUTH_CODE);
     });
 
     it.skip('OAuth2: provider error', async function () {
@@ -484,7 +484,7 @@ describe('Node Security', function() {
         };
         await oauthFlow(STATE)(401, /Authentication with Github failed/);
 
-        assert.deepStrictEqual(githubOauth.getToken.invokedWith, {code: OAUTH_CODE});
+        assert.deepStrictEqual(githubOauth.getToken.invokedWith, OAUTH_CODE);
     });
 
     it.skip('OAuth2: no state passed to callback', async function () {
