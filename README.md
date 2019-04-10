@@ -1062,3 +1062,39 @@ Note: upgrading to HTTPS is a nontrivial step since many resources
 that your main pages reference may still be available only over HTTP
 (e.g. ads, user submitted links). Browsers will refuse to load HTTP
 content from HTTPS resources.
+
+## Enforce HTTPS [enforce_https]
+
+Open incognito mode and go to your app over HTTP.
+
+E.g. http://node-sec.herokuapp.com/
+
+This time we won't get HTTPS. Strict-Transport-Security requires first
+request to be over HTTPS.
+
+app.js
+```javascript
+const enforceSsl = require('express-enforces-ssl');
+
+app.use(enforceSsl());
+// other middleware
+```
+
+SSL enforcement is not rocket science and we could implement it ourselves.
+Open the library source to see what it does. It's only 23 lines of code.
+
+After we add it, our tests should break.
+Try to deploy to Heroku anyway.
+
+The app doesn't work.
+
+When Node.js app works behind a proxy such as Heroku we need to
+set the "trust proxy" variable as described [here](https://expressjs.com/en/guide/behind-proxies.html)
+```javascript
+    if(isProduction) {
+        app.set("trust proxy", true);
+        app.use(enforceSsl());
+    }
+```
+Heroku router sets the original client's IP in the X-Forwarded-For header.
+When we enable "trust proxy" our application can derive original client IP from this header.

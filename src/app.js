@@ -20,6 +20,7 @@ const userSession = require('./middleware/session');
 const cookieParser = require('cookie-parser');
 const limiter = require('./middleware/rateLimit');
 const helmet = require('helmet');
+const enforceSsl = require('express-enforces-ssl');
 
 const home = require('./routes/home');
 const addPost = require('./routes/addPost');
@@ -43,6 +44,10 @@ module.exports = async function initApp({uuid}) {
     app.set("views", path.join(__dirname, "views"));
     app.set("view engine", "hbs");
 
+    if(isProduction) {
+        app.set("trust proxy", true);
+        app.use(enforceSsl());
+    }
     app.use(helmet());
     app.use(cookieParser());
     app.use(session);
