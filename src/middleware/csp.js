@@ -3,6 +3,7 @@ const helmet = require('helmet');
 module.exports = helmet.contentSecurityPolicy({
     directives: {
         defaultSrc: ["'self'"],
-        styleSrc: ['https://cdnjs.cloudflare.com']
+        styleSrc: ['https://cdnjs.cloudflare.com'],
+        requireSriFor: ['style']
     }
 });

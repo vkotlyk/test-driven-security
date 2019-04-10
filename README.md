@@ -1167,3 +1167,41 @@ register.hbs
 Move JS to public/register.js
 
 Check 'Content Security Policy (CSP)' test.
+
+### XSS protection - big picture
+
+Now we can give a recommendation for full XSS protection:
+* validate user input (with a simple validator or schema)
+* use context aware escaping in your templates (not just default HTML escaping)
+* set Content-Security-Policy header
+* don't rely on X-XSS-Protection too much as it's easy to bypass
+
+## Subresource integrity (SRI)
+
+If someone gets hold of our CDN they can tamper with the resources hosted there.
+SRI can be used whenever you load data from 3rd parties.
+
+Inject our CSS from CDN into https://www.srihash.org/:
+```
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css" integrity="sha384-l9M6Adwf4b8uYw86eNILi6yzN7Zf4VoTPpB88nLLXbZ11ybFDaLcd/a2MU1EZXyK" crossorigin="anonymous">
+```
+
+Try to change integrity value and see what happens in your browser.
+
+We can also modify our CSP to require SRI:
+```javascript
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ['https://cdnjs.cloudflare.com'],
+            requireSriFor: ['style']
+        }
+    })
+);
+```
+
+As of this writing Chrome has this check disabled behind a flag while
+Firefox doesn't recognize it.
+
+Fix 'Content Security Policy (CSP)' test.
