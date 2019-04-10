@@ -1176,7 +1176,7 @@ Now we can give a recommendation for full XSS protection:
 * set Content-Security-Policy header
 * don't rely on X-XSS-Protection too much as it's easy to bypass
 
-## Subresource integrity (SRI)
+## Subresource integrity (SRI) [sri]
 
 If someone gets hold of our CDN they can tamper with the resources hosted there.
 SRI can be used whenever you load data from 3rd parties.
