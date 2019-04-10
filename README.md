@@ -963,3 +963,30 @@ Once those tests pass we can fix one of our previous tests for SPA flow:
         assert.deepStrictEqual(JSON.parse(listPostsResponse.text).posts, ['test post']);
     });
 ```
+
+## CSRF protection with SameSite cookies [same_site]
+
+Adding CSRF protection to every single form is a hindrance.
+If you're on a [newer browser](https://caniuse.com/#feat=same-site-cookie-attribute)
+you can use SameSite cookie feature instead.
+
+sameSite in express can take one of the following values:
+* false: same as not setting sameSite
+* 'lax': cross site GET requests are allowed
+* 'strict': no cross site requests are allowed
+* true: same as 'strict'
+
+Let's set our cookie to 'strict' for now.
+
+'CSRF protection with SameSite cookies' test will confirm if you set it right.
+
+To test that it works in the browser you need to disable our previous
+CSRF checking code (checkCsrf middleware).
+Also you need to run attacker code from a different domain other than localhost.
+
+This [tool](https://localtunnel.github.io/www/) may come in handy.
+
+* node attacker/server.js
+* lt --port 3001
+* go to the newly created URL and try the CSRF attack
+
