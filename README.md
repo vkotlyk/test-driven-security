@@ -1436,3 +1436,48 @@ const callback = async (req, res) => {
     }
 };
 ```
+
+## OAuth2 and CSRF [oauth_csrf]
+
+Imagine the scenario where the attacker obtains his authorization code
+from Github but doesn't exchange it for the token.
+Instead he creates a link to the callback: /callback?code=ATTACKERS_CODE
+Then he either sends you a link in an email or in the img tag etc.
+You open the link and now you're talking to Github with the attackers token.
+
+Here's how to prevent it.
+
+oauth/github.js
+```javascript
+const authorizationUri = state => githubOauth.authorizationCode.authorizeURL({
+    redirect_uri: OAUTH2_CALLBACK_URI,
+    scope: 'read:user', // openid when supported
+    state
+});
+```
+
+routes/github.js
+```javascript
+module.exports = ({githubOauth, uuid}) => {
+    const auth = (req, res) => {
+        const state = uuid();
+        req.session.state = state;
+        res.redirect(githubOauth.authorizationUri(state));
+    };
+}
+```
+When you log in to Github you'll pass the state.
+Also you'll save the same state in your session to compare it in the later stage.
+
+And now in you callback handler:
+```javascript
+const {code, state} = req.query;
+
+if (!state || state !== req.session.state) {
+    return githubAuthenticationError(res);
+}
+```
+
+The last remaining OAuth tests should pass now.
+
+One of the existing tests should fail so fix it too.

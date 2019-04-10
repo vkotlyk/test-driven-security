@@ -446,7 +446,7 @@ describe('Node Security', function () {
         const response = await request.get('/auth').expect(302);
 
         assert.deepStrictEqual(response.header.location,
-            'https://github.com/login/oauth/authorize?response_type=code&client_id=github_client_id&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=read%3Auser');
+            'https://github.com/login/oauth/authorize?response_type=code&client_id=github_client_id&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=read%3Auser&state=1234');
     });
 
     function oauthFlow(state) {
@@ -491,15 +491,15 @@ describe('Node Security', function () {
         assert.deepStrictEqual(githubOauth.getToken.invokedWith, OAUTH_CODE);
     });
 
-    it.skip('OAuth2: no state passed to callback', async function () {
+    it('OAuth2: no state passed to callback', async function () {
         await oauthFlow()(401, /Authentication with Github failed/);
     });
 
-    it.skip('OAuth2: different state passed to callback', async function () {
+    it('OAuth2: different state passed to callback', async function () {
         await oauthFlow('HACKED_STATE')(401, /Authentication with Github failed/);
     });
 
-    it.skip('OAuth2: no existing session', async function () {
+    it('OAuth2: no existing session', async function () {
         await request.get('/callback?code=HACKED&state=HACKED').expect(401, /Authentication with Github failed/);
     });
 

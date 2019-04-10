@@ -9,13 +9,19 @@ function githubGatewayError(res) {
     return userErrorPage('login', res.status(BAD_GATEWAY), {error: 'Github authentication is temporarily down'});
 }
 
-module.exports = ({githubOauth}) => {
+module.exports = ({githubOauth, uuid}) => {
     const auth = (req, res) => {
-        res.redirect(githubOauth.authorizationUri);
+        const state = uuid();
+        req.session.state = state;
+        res.redirect(githubOauth.authorizationUri(state));
     };
 
     const callback = async (req, res) => {
-        const {code} = req.query;
+        const {code, state} = req.query;
+
+        if (!state || state !== req.session.state) {
+            return githubAuthenticationError(res);
+        }
 
         try {
             const result = await githubOauth.getToken(code);

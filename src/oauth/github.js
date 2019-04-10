@@ -13,9 +13,10 @@ const GITHUB_OAUTH_CREDENTIALS = {
 const OAUTH2_CALLBACK_URI = process.env.OAUTH2_CALLBACK_URI || 'http://localhost:3000/callback';
 const githubOauth = oauth2.create(GITHUB_OAUTH_CREDENTIALS);
 
-const authorizationUri = githubOauth.authorizationCode.authorizeURL({
+const authorizationUri = state => githubOauth.authorizationCode.authorizeURL({
     redirect_uri: OAUTH2_CALLBACK_URI,
-    scope: 'read:user', // openid when supported
+    scope: 'read:user', // openid when supported,
+    state
 });
 
 module.exports = {
