@@ -414,8 +414,8 @@ describe('Node Security', function () {
     it('CSRF protection with SameSite cookies', async function () {
         const cookies = await user();
 
-        assert.deepStrictEqual(cookies[SESSION_COOKIE_NAME].sameSite, 'Strict');
-        assert.deepStrictEqual(cookies['jwt'].sameSite, 'Strict');
+        assert.deepStrictEqual(cookies[SESSION_COOKIE_NAME].sameSite, 'Lax');
+        assert.deepStrictEqual(cookies['jwt'].sameSite, 'Lax');
     });
 
     it('Obfuscate your tech stack', async function () {

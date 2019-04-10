@@ -1477,7 +1477,22 @@ if (!state || state !== req.session.state) {
     return githubAuthenticationError(res);
 }
 ```
+In the callback code Github will provide state in the query param.
+You compare it against your session state.
 
 The last remaining OAuth tests should pass now.
 
 One of the existing tests should fail so fix it too.
+
+### OAuth and SameSite cookies [lax_samesite]
+There's one HUUUGE gotcha in the previous example that caused
+many endless debugging sessions for many developers.
+When Github calls you back no cookies will be sent.
+Remember our SameSite: 'strict' policy? It means no cookies are sent
+when third parties initiate requests to our website.
+We can relax the constraint and set SameSite: 'lax' so that GET requests
+will have cookies attached.
+
+Fix one failing tests after this change.
+
+More information about [Github OAuth](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/).
