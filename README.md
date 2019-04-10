@@ -1496,3 +1496,96 @@ will have cookies attached.
 Fix one failing tests after this change.
 
 More information about [Github OAuth](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/).
+
+## Security as a Service
+
+As you can see managing authorization yourself if a lot of work.
+Since it's probably neither your core business nor differentiating factor
+you may consider outsourcing this responsibility to the SaaS provider e.g.
+https://auth0.com/. Please check with your legal department if it's a valid
+option.
+And if you go for the Security as a Service model it's still important
+to understand the concepts we've just learned.
+
+## Most Common Vulnerabilities
+
+Let's look at the most common vulnerabilities found in Node.js
+packages. They come from [this report](https://learning.oreilly.com/library/view/patterns-in-node/9781491999981/).
+
+![Imgur](https://i.imgur.com/i1JLL1Y.png)
+
+These statistics are important in prioritizing efforts when writing secure code, conducting security-focused code reviews, or penetration testing.
+
+## Insecure Access to Filesystem
+
+```javascript
+app.use(express.static(__dirname + '/public'));
+```
+
+In our code we already have this covered since we only serve files in one directory.
+
+Here's a common antipattern to avoid:
+```javascript
+const userInput = req.url;
+const fullPath = path.join(__dirname, 'public', userInput);
+```
+Just use static middleware or path.normalize user input
+```javascript
+const path = require('path');
+const fullPath = path.join(__dirname, 'public', path.normalize(userInput));
+```
+
+## Sensitive Data Exposure [sensitive_data_exposure]
+
+In general - don't store any sensitive data in your repository (private keys, environment variables, passwords etc.).
+One strategy I was successful with: use secure environment variables feature in your CI/CD tool to set
+environment variables in your PaaS.
+
+People removing passwords from Git history: https://github.com/search?q=%22remove+password%22&type=Commits
+
+In our codebase - please make sure that you don't hardcode:
+* production GITHUB_CLIENT_SECRET
+* production MONGODB_URI
+* production JWT_SECRET
+
+In development you can use dotenv library and .env file that you add
+to .gitignore.
+Good litmus test for your code is to ask yourself this question:
+could I open source my application without leaking any sensitive information?
+
+Here's my Heroku settings:
+![Config Vars](https://i.imgur.com/4WXvgJy.png)
+
+Also you shouldn't expose too much in your error messages and stack traces.
+We override default Express error handling with generic messages.
+It makes it more difficult to guess what technology is used in our stack.
+
+errors/404.js
+```javascript
+const {NOT_FOUND} = require('../statusCodes');
+
+module.exports = function (req, res, next) {
+    res.status(NOT_FOUND).send("These Are Not the Droids You Are Looking For");
+};
+```
+
+errors/500.js
+```javascript
+const debug = require('debug')('node-security');
+const {INTERNAL_SERVER_ERROR} = require('../statusCodes');
+
+module.exports = function (err, req, res, next) {
+    res.status(err.status || INTERNAL_SERVER_ERROR);
+    debug(err);
+    res.send(err.status > 499 ? "Something bad happened. It's not you it's us." : err.message);
+};
+```
+
+app.js
+```javascript
+const notFound = require('./errors/404');
+const serverError = require('./errors/500');
+
+app.use(notFound);
+app.use(serverError);
+```

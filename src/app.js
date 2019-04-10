@@ -29,7 +29,8 @@ const login = require('./routes/login');
 const logout = require('./routes/logout');
 const register = require('./routes/register');
 const github = require('./routes/github');
-const error = require('./errors/error');
+const notFound = require('./errors/404');
+const serverError = require('./errors/500');
 
 
 module.exports = async function initApp({uuid, githubOauth}) {
@@ -68,7 +69,8 @@ module.exports = async function initApp({uuid, githubOauth}) {
     app.post('/post', isAuthenticated, checkCsrf, addPost({posts, renderListPage}));
     app.get('/auth', auth);
     app.get('/callback', callback);
-    app.use(error);
+    app.use(notFound);
+    app.use(serverError);
 
     app.findUser = async (username) => {
         return await users.findOne({username});
