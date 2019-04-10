@@ -3,5 +3,17 @@ module.exports = ({githubOauth}) => {
         res.redirect(githubOauth.authorizationUri);
     };
 
-    return {auth};
+    const callback = async (req, res) => {
+        const {code} = req.query;
+
+        const result = await githubOauth.getToken(code);
+        const access_token = result.access_token;
+
+        req.session.regenerate(function (err) {
+            req.session.user = {username: 'github user'};
+            res.redirect('/');
+        });
+    };
+
+    return {auth, callback};
 };

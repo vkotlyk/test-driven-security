@@ -6,6 +6,7 @@ const GITHUB_OAUTH_CREDENTIALS = {
     },
     auth: {
         tokenHost: 'https://github.com',
+        tokenPath: '/login/oauth/access_token',
         authorizePath: '/login/oauth/authorize'
     }
 };
@@ -18,5 +19,6 @@ const authorizationUri = githubOauth.authorizationCode.authorizeURL({
 });
 
 module.exports = {
-    authorizationUri
+    authorizationUri,
+    getToken: code => githubOauth.authorizationCode.getToken(code)
 };

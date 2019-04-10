@@ -41,7 +41,7 @@ module.exports = async function initApp({uuid, githubOauth}) {
     const posts = db.collection('posts');
     const {session, store} = userSession(COOKIE_OPTIONS, DB);
     const renderListPage = home(posts);
-    const {auth} = github({githubOauth, uuid});
+    const {auth, callback} = github({githubOauth, uuid});
 
     const app = express();
     app.set("views", path.join(__dirname, "views"));
@@ -67,6 +67,7 @@ module.exports = async function initApp({uuid, githubOauth}) {
     app.get('/logout', logout);
     app.post('/post', isAuthenticated, checkCsrf, addPost({posts, renderListPage}));
     app.get('/auth', auth);
+    app.get('/callback', callback);
     app.use(error);
 
     app.findUser = async (username) => {

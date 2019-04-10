@@ -1324,3 +1324,69 @@ Let's see if everything works with the following test:
 'OAuth2: Prepare Github authorize path'
 
 Also test in your browser if you're being redirected to github login screen.
+
+### 3) Login/authorize with Github
+
+This part is done outside our application so no code here.
+
+### 4) Callback handling
+
+Here's the part where Github calls us back.
+
+routes/github.js
+```javascript
+module.exports = ({githubOauth}) => {
+    const auth = (req, res) => {
+        res.redirect(githubOauth.authorizationUri);
+    };
+
+    const callback = async (req, res) => {
+        const {code} = req.query;
+    };
+
+    return {auth, callback};
+};
+```
+
+app.js
+```javascript
+const {auth, callback} = github({githubOauth, uuid});
+
+app.get('/callback', callback);
+```
+
+### 5) Exchange code for token [oauth_callback]
+
+We can exchange one time use only code for the token.
+
+oauth/github.js
+```javascript
+const GITHUB_OAUTH_CREDENTIALS = {
+    auth: {
+        tokenPath: '/login/oauth/access_token'
+    }
+};
+
+
+module.exports = {
+    authorizationUri,
+    getToken: code => githubOauth.authorizationCode.getToken(code)
+};
+```
+
+routes/github.js
+```javascript
+const callback = async (req, res) => {
+        const {code} = req.query;
+
+        const result = await githubOauth.getToken(code);
+        const access_token = result.access_token;
+
+        req.session.regenerate(function (err) {
+            req.session.user = {username: 'github user'};
+            res.redirect('/');
+        });
+    };
+```
+
+Test it with 'OAuth2: exchange code for token' and manually in your browser.
