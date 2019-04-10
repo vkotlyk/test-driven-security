@@ -1205,3 +1205,122 @@ As of this writing Chrome has this check disabled behind a flag while
 Firefox doesn't recognize it.
 
 Fix 'Content Security Policy (CSP)' test.
+
+## OAuth2
+
+Handling passwords ourselves is too much hassle. What's more people
+don't want yet another account to manage. Let's implement login with Github
+account.
+
+Here's what we gonna implement conceptually
+![OAuth2](https://i.imgur.com/r1tUJ8h.jpg?1)
+
+### Github account preparations
+
+Go to: https://github.com/settings/developers
+
+OAuth Apps
+
+localhost
+```
+Application name: node-security-local
+Homepage URL: http://localhost:3000
+Authorization callback URL: http://localhost:3000/callback
+```
+
+Heroku
+```
+Application name: node-security-heroku
+Homepage URL: https://node-sec.herokuapp.com (pick yours)
+Authorization callback URL: https://node-sec.herokuapp.com/callback (pick yours)
+```
+
+### 1) Init process
+
+Clicking on a link will trigger the whole process
+
+layout.hbs
+```html
+<a href="/auth">Login with Github</a>
+```
+
+### 2) Redirect to Github [oauth_redirect]
+
+Now we need to implement the backend part
+
+oauth/github.js
+```javascript
+const oauth2 = require('simple-oauth2');
+const GITHUB_OAUTH_CREDENTIALS = {
+    client: {
+        id: process.env.GITHUB_CLIENT_ID || 'github_client_id',
+        secret: process.env.GITHUB_CLIENT_SECRET || 'github_client_secret'
+    },
+    auth: {
+        tokenHost: 'https://github.com',
+        authorizePath: '/login/oauth/authorize'
+    }
+};
+const OAUTH2_CALLBACK_URI = process.env.OAUTH2_CALLBACK_URI || 'http://localhost:3000/callback';
+const githubOauth = oauth2.create(GITHUB_OAUTH_CREDENTIALS);
+
+const authorizationUri = githubOauth.authorizationCode.authorizeURL({
+    redirect_uri: OAUTH2_CALLBACK_URI,
+    scope: 'read:user', // openid when supported
+});
+
+module.exports = {
+    authorizationUri
+};
+```
+This code is responsible for generating authorizationUri
+where we go to in step 2 in the oauth diagram above.
+
+
+Next let's inject oauth client into our server.js
+```javascript
+const githubOauth = require('./oauth/github');
+
+const app = await initApp({uuid, githubOauth});
+```
+It will make it easier to inject test doubles in tests later.
+
+Now we can prepare our auth route
+
+routes/github.js
+```javascript
+module.exports = ({githubOauth}) => {
+    const auth = (req, res) => {
+        res.redirect(githubOauth.authorizationUri);
+    };
+
+    return {auth};
+};
+```
+We're injecting githubOauth client and redirecting to its authorizationUri.
+
+Finally put things together in app.js:
+```javascript
+const github = require('./routes/github');
+
+module.exports = async function initApp({githubOauth, uuid}) {
+    ...
+    const {auth} = github({githubOauth, uuid});
+    ...
+    app.get('/auth', auth);
+    ...
+}
+```
+We inject oauth client into our github route and add the route into express.
+
+Finally we can update our test and inject github client:
+```javascript
+const githubOauth = require('../src/oauth/github');
+
+app = await require('../src/app.js')({uuid, githubOauth});
+```
+
+Let's see if everything works with the following test:
+'OAuth2: Prepare Github authorize path'
+
+Also test in your browser if you're being redirected to github login screen.

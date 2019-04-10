@@ -8,6 +8,7 @@ const SESSION_COOKIE_NAME = 'node-security';
 const OAUTH_CODE = '8f822999c6173a16cb46';
 const STATE = '1234';
 const uuid = () => STATE;
+const githubOauth = require('../src/oauth/github');
 
 function times(n, character) {
     return Array(n + 1).join(character);
@@ -32,7 +33,7 @@ describe('Node Security', function () {
     let app, request;
 
     beforeEach(async () => {
-        app = await require('../src/app.js')({uuid});
+        app = await require('../src/app.js')({uuid, githubOauth});
         await app.clean();
         request = httpClient(app);
     });
@@ -441,11 +442,11 @@ describe('Node Security', function () {
         await checkHeader('content-security-policy', "default-src 'self'; style-src https://cdnjs.cloudflare.com; require-sri-for style");
     });
 
-    it.skip('OAuth2: Prepare Github authorize path', async function () {
+    it('OAuth2: Prepare Github authorize path', async function () {
         const response = await request.get('/auth').expect(302);
 
         assert.deepStrictEqual(response.header.location,
-            'https://github.com/login/oauth/authorize?response_type=code&client_id=github_client_id&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=read%3Auser&state=1234');
+            'https://github.com/login/oauth/authorize?response_type=code&client_id=github_client_id&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=read%3Auser');
     });
 
     function oauthFlow(state) {
