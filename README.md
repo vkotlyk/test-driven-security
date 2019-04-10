@@ -1613,3 +1613,60 @@ the estimation to the browser.
 If you're wondering about email length limitations there's a limit of 254
 characters but since we use a library function for email validation
 it's already taken care of.
+
+## Audit your dependencies
+
+npm started treating security more seriously recently.
+Nowadays it supports 2FA.
+
+```npm audit``` scans your dependencies for known vulnerabilities
+and tells you what to do.
+
+```npm audit fix``` will upgrade dependencies for you.
+
+Basic security audit also runs after every ```npm install```.
+It's called quick audits.
+
+Update your dependencies on a regular basis. If you're a couple of years
+out-of-date you may find it difficult to upgrade to the latest
+version with a security fix.
+
+## Deploy in a secure environment and move responsibilities to the infrastructure
+
+Since we're running our code in Heroku some infrastructure security responsibilities
+are taken care of by the Heroku team:
+* patching Node.js and operating system with the latest security updates
+* running your application with limited privileges
+* preventing root access to boxes
+* maintaining multiple developer accounts
+* exposing only necessary ports
+* prohibiting port scanning
+* application isolation
+* DDoS attack mitigation
+* SSL termination
+* SSL certificate management
+* many more (https://www.heroku.com/policy/security)
+
+Heroku as any other decent Platform as a Service gives us basic
+request/response logging out of the box.
+Security and [observability](https://martinfowler.com/articles/domain-oriented-observability.html)
+go hand in hand.
+Just because we're using HTTP status codes to convey semantic meaning
+we can use Heroku access log to extract the following information:
+* IPs of users who exceeded rate limit (429 codes + automatic IP logging in Heroku)
+* number of failed login and register attempts (400 and 401 codes)
+* number of duplicate registration attempts (409 codes)
+
+Because Heroku logs are structured it's easy for logging and monitoring
+tools to set alerts based on specific conditions e.g. big number of
+429 codes or 400/401 codes.
+
+Remember not to put any sensitive data into the URLs.
+
+## Resources
+* [Web Security Basics](https://martinfowler.com/articles/web-security-basics.html)
+* [Secure Your Node.js Web Application](https://pragprog.com/book/kdnodesec/secure-your-node-js-web-application)
+* [Essential Node.js Security](https://leanpub.com/nodejssecurity)
+* [Securing Applications in Node.js](https://www.packtpub.com/web-development/securing-applications-nodejs-video)
+* [Node Cookbook](https://www.packtpub.com/web-development/node-cookbook-third-edition)
+* [Identity and Data Security for Web Development](http://shop.oreilly.com/product/0636920044376.do)
