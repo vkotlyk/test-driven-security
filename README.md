@@ -1036,3 +1036,17 @@ what's being served by looking at the content itself.
 This header is a misnomer since it provides very little XSS protection
 and you should use other techniques we used before.
 
+## SSL termination
+
+We'd like to serve our application over HTTPS to send encrypted data.
+We'd like to offload SSL/TLS termination to the infrastructure
+and not implement operational concerns in our application.
+
+Let's use Heroku to do the heavy lifting for us.
+* create Heroku app ```heroku create```
+* add DB (requires account with Credit Card attached) ```heroku addons:create mongolab:sandbox```
+* deploy code ```git push heroku master```
+* open app ```heroku open```
+
+My deployed app: https://node-sec.herokuapp.com/
+

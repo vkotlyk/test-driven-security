@@ -3,7 +3,7 @@ const MongoClient = require('mongodb').MongoClient;
 const hbs = require('hbs');
 const path = require('path');
 
-const DB = 'mongodb://localhost:27017/node-security';
+const DB = process.env.MONGODB_URI || 'mongodb://localhost:27017/node-security';
 const ENV = process.env.NODE_ENV || 'development';
 const isProduction = ENV.toLowerCase() === 'production';
 const COOKIE_OPTIONS = {secure: isProduction, httpOnly: true, sameSite: 'strict'};
