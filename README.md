@@ -69,6 +69,9 @@ Add this snippet to views/login.hbs:
 
 There should be 2 corresponding tests ('Invalid password' and 'Invalid login') that should go green.
 
+Note: another place where the attacker may perform account enumeration is forgotten email feature.
+Always say something like 'email sent' event when they put gibberish.
+
 ## Rate limit [rate_limit]
 
 Let's simulate a situation with an attacker making an excessive number of
@@ -1552,6 +1555,7 @@ In our codebase - please make sure that you don't hardcode:
 * production GITHUB_CLIENT_SECRET
 * production MONGODB_URI
 * production JWT_SECRET
+* production SESSION_SECRET
 
 In development you can use dotenv library and .env file that you add
 to .gitignore.
