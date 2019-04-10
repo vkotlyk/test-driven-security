@@ -1098,3 +1098,72 @@ set the "trust proxy" variable as described [here](https://expressjs.com/en/guid
 ```
 Heroku router sets the original client's IP in the X-Forwarded-For header.
 When we enable "trust proxy" our application can derive original client IP from this header.
+
+## Content Security Policy [csp]
+
+This is one part of helmet library that is not enabled by default
+because it requires custom configuration.
+CSP is a whitelist of scripts, stylesheets, fonts, images, form actions etc. that are
+allowed on our website.
+One drawback is that it usually takes several iterations to get it right.
+It may be difficult to add to the existing website without breaking things.
+As of this writing about 30% of the page loads have CSP.
+
+### Default source
+
+Let's start with a basic CSP configuration.
+
+middleware/csp.js
+```javascript
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"]
+        }
+    })
+);
+```
+It says - no external resources are allowed, just your own stuff.
+
+Add it to app.js
+```javascript
+const csp = require('./middleware/csp');
+
+app.use(csp);
+```
+
+When you go to localhost:3000 console tab should tell you that CSS we added
+was not loaded.
+
+### Whitelist CSS
+
+Let's whitelist all CSS from our CDN:
+```javascript
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ['https://cdnjs.cloudflare.com'],
+        }
+    })
+);
+```
+
+Check if the CSS got applies this time.
+
+### Unsafe inline JS
+
+Now got to localhost:3000/register and you should see that inline
+script got blocked.
+We can either allow inline JS: ```scriptSrc: ["'unsafe-inline'"]```
+or move JS to a separate file we serve ourselves.
+
+Let's choose the second option.
+register.hbs
+```
+<script src="register.js"></script>
+```
+
+Move JS to public/register.js
+
+Check 'Content Security Policy (CSP)' test.

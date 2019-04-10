@@ -20,6 +20,7 @@ const userSession = require('./middleware/session');
 const cookieParser = require('cookie-parser');
 const limiter = require('./middleware/rateLimit');
 const helmet = require('helmet');
+const csp = require('./middleware/csp');
 const enforceSsl = require('express-enforces-ssl');
 
 const home = require('./routes/home');
@@ -49,6 +50,7 @@ module.exports = async function initApp({uuid}) {
         app.use(enforceSsl());
     }
     app.use(helmet());
+    app.use(csp);
     app.use(cookieParser());
     app.use(session);
     app.use(bodyParser.urlencoded({extended: false}));

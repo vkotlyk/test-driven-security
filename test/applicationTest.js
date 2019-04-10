@@ -437,8 +437,8 @@ describe('Node Security', function () {
         await checkHeader('strict-transport-security', 'max-age=15552000; includeSubDomains');
     });
 
-    it.skip('Content Security Policy (CSP)', async function () {
-        await checkHeader('content-security-policy', "default-src 'self'; style-src https://cdnjs.cloudflare.com; require-sri-for style");
+    it('Content Security Policy (CSP)', async function () {
+        await checkHeader('content-security-policy', "default-src 'self'; style-src https://cdnjs.cloudflare.com");
     });
 
     it.skip('OAuth2: Prepare Github authorize path', async function () {
