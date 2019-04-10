@@ -410,7 +410,7 @@ routes/login.js
 ```javascript
 const jwt = require('jsonwebtoken');
 
-const login = ({users, uuid, jwtSecret, cookieOptions}) => async (req, res) => {
+const login = ({users, jwtSecret, cookieOptions}) => async (req, res) => {
     const token = jwt.sign({username}, jwtSecret, {expiresIn: '1h'});
     res.cookie('jwt', token, {...cookieOptions, maxAge: 1 * 60 * 1000});
 
@@ -870,3 +870,96 @@ await post({cookies, csrfToken, msg});
 ```
 For now we can skip 'Basic register/login/post/read posts flow happy path for SPA'.
 We'll fix it later.
+
+## CSRF protection in JWT tokens [csrf_jwt_token]
+
+Sometimes we want to make multiple requests without obtaining a new CSRF token
+each time.
+
+Here's a golden standard for CSRF protection when using JWT:
+![JWT with CSRF protection](https://camo.githubusercontent.com/c68cd231dad57775ee087d9c4568ad6127a834ea/68747470733a2f2f692e696d6775722e636f6d2f4c55695a5146692e6a70673f32)
+
+You may find more information [here](https://www.youtube.com/watch?v=67mezK3NzpU)
+
+What we need to do is to add CSRF token inside JWT token and send the CSRF
+token in the HTTP header.
+
+server.js
+```javascript
+const uuid = require('uuid/v4');
+
+const app = await initApp({uuid});
+```
+We're injecting uuid from the outside so that we can mock it out in tests.
+
+app.js
+```javascript
+module.exports = async function initApp({uuid}) {
+    ...
+    app.post('/login', limiter(), login({users, uuid, jwtSecret: JWT_SECRET, cookieOptions: COOKIE_OPTIONS}));
+    ...
+}
+```
+We're passing uuid to the actual location where it's needed.
+
+routes/login.js
+```javascript
+const login = ({users, uuid, jwtSecret, cookieOptions}) => async (req, res) => {
+    ...
+    const csrf = uuid();
+    const token = jwt.sign({username, 'csrf-token': csrf}, jwtSecret, {expiresIn: '1h'});
+    res.set('csrf-token', csrf);
+    ...
+}
+```
+Here's the gist of the JWT CSRF token generation.
+We're generating random CSRF token and put it both inside JWT and in a header.
+
+middleware/checkCsrf.js
+```javascript
+const {BAD_REQUEST} = require('../statusCodes');
+
+const checker = csrf => function checkCsrf(req, res, next) {
+    if (req.user && req.header('csrf-token')) {
+        if (req.user['csrf-token'] === req.header('csrf-token')) {
+            next();
+        } else {
+            res.status(BAD_REQUEST).send("Only authenticated users can post");
+        }
+    } else {
+        return csrf(req, res, next);
+    }
+};
+
+module.exports = checker;
+```
+Our enhances CSRF checker for POST requests is now enhanced
+with csrf-token header checking.
+
+app.js
+```javascript
+const csrf = require('csurf')();
+const checkCsrf = require('./middleware/checkCsrf')(csrf);
+
+app.post('/post', isAuthenticated, checkCsrf, addPost({posts, renderListPage}));
+```
+Please note that checkCsrf is after isAuthenticated middleware which
+sets req.user.
+
+Check all 'Secure JWT token against CSRF' tests.
+
+Once those tests pass we can fix one of our previous tests for SPA flow:
+```javascript
+    it('Basic register/login/post/read posts flow happy path for SPA', async function () {
+        const {cookies, csrfToken} = await userJSON(DEFAULT_USER_CREDENTIALS);
+        const {jwt} = cookies;
+        const {header: {location}} = await postJSON({
+            cookies: {jwt},
+            csrfToken,
+            msg: 'test post'
+        }).expect(302);
+        const listPostsResponse = await getJSON({url: location}).expect(200);
+
+        assert.deepStrictEqual(JSON.parse(listPostsResponse.text).posts, ['test post']);
+    });
+```

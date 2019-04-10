@@ -7,6 +7,7 @@ const DEFAULT_USER_CREDENTIALS = {username: 'mark@gmail.com', password: 'correct
 const SESSION_COOKIE_NAME = 'node-security';
 const OAUTH_CODE = '8f822999c6173a16cb46';
 const STATE = '1234';
+const uuid = () => STATE;
 
 function times(n, character) {
     return Array(n + 1).join(character);
@@ -31,7 +32,7 @@ describe('Node Security', function () {
     let app, request;
 
     beforeEach(async () => {
-        app = await require('../src/app.js')();
+        app = await require('../src/app.js')({uuid});
         await app.clean();
         request = httpClient(app);
     });
@@ -267,12 +268,12 @@ describe('Node Security', function () {
         assert.ok(jwtCookie.maxAge, 60);
     });
 
-    it.skip('Basic register/login/post/read posts flow happy path for SPA', async function () {
-        await registerJSON(DEFAULT_USER_CREDENTIALS).expect(200, '"Registered"');
-        const loginResponse = await loginJSON(DEFAULT_USER_CREDENTIALS).expect(200, '"Success"');
-        const {jwt} = extractSetCookies(loginResponse);
+    it('Basic register/login/post/read posts flow happy path for SPA', async function () {
+        const {cookies, csrfToken} = await userJSON(DEFAULT_USER_CREDENTIALS);
+        const {jwt} = cookies;
         const {header: {location}} = await postJSON({
             cookies: {jwt},
+            csrfToken,
             msg: 'test post'
         }).expect(302);
         const listPostsResponse = await getJSON({url: location}).expect(200);
@@ -389,21 +390,21 @@ describe('Node Security', function () {
         await post({cookies, csrfToken: '', msg: 'irrelevant'}).expect(403);
     });
 
-    it.skip('Secure JWT token against CSRF - happy path', async function () {
+    it('Secure JWT token against CSRF - happy path', async function () {
         const {cookies, csrfToken} = await userJSON();
         const {jwt} = cookies;
 
         await postJSON({cookies: {jwt}, csrfToken, msg: 'irrelevant'}).expect(302);
     });
 
-    it.skip('Secure JWT token against CSRF - no token', async function () {
+    it('Secure JWT token against CSRF - no token', async function () {
         const {cookies} = await userJSON();
         const {jwt} = cookies;
 
         await postJSON({cookies: {jwt}, csrfToken: '', msg: 'irrelevant'}).expect(403);
     });
 
-    it.skip('Secure JWT token against CSRF - no jwt cookie', async function () {
+    it('Secure JWT token against CSRF - no jwt cookie', async function () {
         const {csrfToken} = await userJSON();
 
         await postJSON({cookies: {}, csrfToken, msg: 'irrelevant'}).expect(400);
