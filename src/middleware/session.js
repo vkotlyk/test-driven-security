@@ -4,7 +4,7 @@ const MongoStore = require('connect-mongo')(session);
 module.exports = (cookie, url) => {
     const store = new MongoStore({url, ttl: 60 * 60});
     const userSession = session({
-        secret: 'sessionsecret',
+        secret: process.env.SESSION_SECRET || 'sessionsecret',
         resave: false,
         saveUninitialized: false,
         cookie,
