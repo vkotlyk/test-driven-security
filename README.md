@@ -194,6 +194,10 @@ And finally add this extension to our template engine in app.js
 require('./output/sanitizeHtml')(hbs);
 ```
 
+Note: we do sanitizing of the output not input. The reason for that
+is that raw data can be used in different contexts and each output context
+has its own sanitization rules.
+
 ## Hardening HTTP session [hardening_http_session]
 
 In the previous exercise JS could access our cookie. Let's fix it.
