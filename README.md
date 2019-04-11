@@ -54,6 +54,10 @@ const debug = require('debug')('node-security');
 debug(e);
 ```
 
+Note: In the registration process we're telling people that a given account exists.
+A more secure approach would be to always tell users e.g. 'email sent' and send the
+email telling them the account already exists.
+
 ## Invalid login and password feedback [invalid_login_credentials]
 
 Currently we provide no feedback on invalid login credentials.
@@ -131,6 +135,8 @@ would try to access your cookies, local storage etc. and send
 There's a test 'XSS prevention in HTML' telling us to escape HTML content.
 
 In the views/home.hbs replace {{{}}} with {{}} to escape HTML content. It should make the test green.
+
+Note: Injection attacks are no.1 on the OWASP top 10 list.
 
 ## Sanitizing HTML [sanitizing_html]
 
@@ -295,6 +301,9 @@ TTL is application specific. We go for 1h session expiry if user is inactive.
 Cat pictures website may have 1 month long sessions while bank may go for 10 minutes.
 
 Also please run all our tests to make sure we haven't introduced regression errors.
+
+Note: we're allowing multiple simultaneous sessions per user. If the business decision was
+to disallow it, we'd need to implement it on the top of the store.
 
 ## Password hashing [bcrypt]
 
@@ -541,6 +550,8 @@ Relevant test: 'NoSQL injection prevention with sanitization'
 When we run this test and set a debugger in the POST /login we'll find out
 that the attacker read the user and then the application crashed
 on bcrypt.compare.
+
+Note: Injection attacks are no.1 on the OWASP top 10 list.
 
 ## Blind NoSQL injection with popular passwords [blind_nosql_injection]
 
@@ -1028,6 +1039,9 @@ behind their content and trick us into clicking controls on our own website.
 You can open our attacker code with clickjacking example.
 
 Please note that we didn't DENY our website to load from same domain iframes.
+
+X-Frame-Options is a temporary solution until Content Security Policy becomes more
+popular (frame-src).
 
 ### Prevent browser from sniffing MIME type
 
@@ -1673,9 +1687,10 @@ tools to set alerts based on specific conditions e.g. big number of
 Remember not to put any sensitive data into the URLs.
 
 ## Resources
-* [Web Security Basics](https://martinfowler.com/articles/web-security-basics.html)
-* [Secure Your Node.js Web Application](https://pragprog.com/book/kdnodesec/secure-your-node-js-web-application)
-* [Essential Node.js Security](https://leanpub.com/nodejssecurity)
-* [Securing Applications in Node.js](https://www.packtpub.com/web-development/securing-applications-nodejs-video)
-* [Node Cookbook](https://www.packtpub.com/web-development/node-cookbook-third-edition)
-* [Identity and Data Security for Web Development](http://shop.oreilly.com/product/0636920044376.do)
+* [Martin Fowler Bliki: Web Security Basics](https://martinfowler.com/articles/web-security-basics.html)
+* [PragProg: Secure Your Node.js Web Application](https://pragprog.com/book/kdnodesec/secure-your-node-js-web-application)
+* [LeanPub: Essential Node.js Security](https://leanpub.com/nodejssecurity)
+* [Packt: Securing Applications in Node.js](https://www.packtpub.com/web-development/securing-applications-nodejs-video)
+* [Pluralsight: Securing Your Node.js Web App](https://app.pluralsight.com/library/courses/securing-node-js-web-app/table-of-contents)
+* [Packt: Node Cookbook](https://www.packtpub.com/web-development/node-cookbook-third-edition)
+* [O'Reilly: Identity and Data Security for Web Development](http://shop.oreilly.com/product/0636920044376.do)
