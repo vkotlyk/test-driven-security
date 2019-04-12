@@ -1084,6 +1084,10 @@ that your main pages reference may still be available only over HTTP
 (e.g. ads, user submitted links). Browsers will refuse to load HTTP
 content from HTTPS resources.
 
+Note: make sure that you serve your GET login and GET registration forms
+are sent over HTTPS so that no one tampers with your forms and e.g. adds a
+keylogger. HTTPS only when submitting a form is not enough.
+
 ## Enforce HTTPS [enforce_https]
 
 Open incognito mode and go to your app over HTTP.
@@ -1193,9 +1197,10 @@ Check 'Content Security Policy (CSP)' test.
 
 Now we can give a recommendation for full XSS protection:
 * validate user input (with a simple validator or schema)
-* use context aware escaping in your templates (not just default HTML escaping)
+* use context aware escaping/sanitization in your templates (not just default HTML escaping)
 * set Content-Security-Policy header
 * don't rely on X-XSS-Protection too much as it's easy to bypass
+* use HTTPOnly Cookies
 
 ## Subresource integrity (SRI) [sri]
 
