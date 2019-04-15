@@ -439,7 +439,7 @@ describe('Node Security', function () {
     });
 
     it('Content Security Policy (CSP)', async function () {
-        await checkHeader('content-security-policy', "default-src 'self'; style-src https://cdnjs.cloudflare.com; require-sri-for style");
+        await checkHeader('content-security-policy', "default-src 'self'; style-src https://cdnjs.cloudflare.com; require-sri-for style; upgrade-insecure-requests");
     });
 
     it('OAuth2: Prepare Github authorize path', async function () {

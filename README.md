@@ -814,8 +814,9 @@ And add it to app.js
 require('./output/encodeURL')(hbs);
 ```
 
-To summarize then encoding part remember to store use content in the raw format
+To summarize the encoding part remember to store the user content in the raw format
 and encode it at rendering time depending on context.
+Treat user data as data, not as code.
 
 ## Cross Site Request Forgery (CSRF/XSRF) [csrf]
 
@@ -1008,6 +1009,8 @@ This [tool](https://localtunnel.github.io/www/) may come in handy.
 * lt --port 3001
 * go to the newly created URL and try the CSRF attack
 
+There's another useful utility: http://lvh.me:3001
+
 ## Hardening HTTP headers [helmet]
 
 Helmet library provides sane defaults for the security related HTTP headers.
@@ -1081,7 +1084,7 @@ We also have a corresponding mocha test for it.
 
 Note: upgrading to HTTPS is a nontrivial step since many resources
 that your main pages reference may still be available only over HTTP
-(e.g. ads, user submitted links). Browsers will refuse to load HTTP
+(e.g. ads, user submitted links). Some browsers will refuse to load HTTP
 content from HTTPS resources.
 
 Note: make sure that you serve your GET login and GET registration forms
@@ -1123,6 +1126,9 @@ set the "trust proxy" variable as described [here](https://expressjs.com/en/guid
 ```
 Heroku router sets the original client's IP in the X-Forwarded-For header.
 When we enable "trust proxy" our application can derive original client IP from this header.
+
+Note: First redirect in Chrome is 301, but once HSTS kicks in it's 307.
+
 
 ## Content Security Policy [csp]
 
@@ -1192,6 +1198,12 @@ register.hbs
 Move JS to public/register.js
 
 Check 'Content Security Policy (CSP)' test.
+
+### Upgrade Insecure Requests
+
+Finally you can add upgradeInsecureRequests: true
+
+It will tell browser to rewrite all legacy HTTP links to HTTPS.
 
 ### XSS protection - big picture
 
