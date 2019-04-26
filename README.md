@@ -1249,6 +1249,9 @@ npm loaded resources
 
 More: https://snyk.io/blog/introducing-experimental-integrity-policies-to-node-js
 
+Summary: If you're pulling 3rd part resources and don't have SRI and CSP
+you're asking yourself for troubles.
+
 ## OAuth2
 
 Handling passwords ourselves is too much hassle. What's more people
@@ -1674,6 +1677,14 @@ It's called quick audits.
 Update your dependencies on a regular basis. If you're a couple of years
 out-of-date you may find it difficult to upgrade to the latest
 version with a security fix.
+
+## Typosquatting
+
+Is it coffeescript (double 'e') or coffescript (single 'e')?
+https://www.npmjs.com/package/coffescript
+
+Be careful of typos when installing packages. Some malicious squatters
+could have taken it.
 
 ## Deploy in a secure environment and move responsibilities to the infrastructure
 
