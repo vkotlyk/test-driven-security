@@ -1205,6 +1205,11 @@ Finally you can add upgradeInsecureRequests: true
 
 It will tell browser to rewrite all legacy HTTP links to HTTPS.
 
+What does upgrade-insecure-requests do that HSTS doesn't?
+
+It cascades down to all content embedded insecurely in the page
+regardless of the origin it's served from.
+
 ### XSS protection - big picture
 
 Now we can give a recommendation for full XSS protection:
